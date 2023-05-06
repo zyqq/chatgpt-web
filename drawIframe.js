@@ -3,8 +3,9 @@
 // @author       yiqiuzheng
 // @description  自动生成网页定制脚本，支持深色模式、隐藏元素等功能
 // @namespace    http://tampermonkey.net/
-// @version      1
+// @version      1.1
 // @updateURL    https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
+// @downloadURL  https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @match        http*://*/*
 // @grant        GM_addStyle
 // ==/UserScript==
@@ -404,5 +405,5 @@
 
     // 执行主函数
     main();
-    console.log('这是最新代码5');
+    console.log('这是最新代码4');
 })();
