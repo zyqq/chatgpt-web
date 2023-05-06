@@ -12,7 +12,7 @@
 
 (function() {
     'use strict';
-    const domain = 'https://echo-chatgpt.zeabur.app/';
+    const domain = 'https://chatgpt-echo.zeabur.app/';
 
     // 默认选项
     var defaultOptions = {
