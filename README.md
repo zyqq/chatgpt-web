@@ -17,3 +17,23 @@
 ### 2、autoUpdate.js
 
 放在油猴插件中的代码，会自动更新drawIframe.js中的代码。将其复制到油猴插件中即可。
+
+![内容](./assets/script.png)
+
+## 三、计划内容
+
+- ✅ ChatGPT交互
+- [] 油猴脚本助手（已生成prompt模板，待完善30%）
+  - 案例
+  - 用户需求精确引导
+- [] 选中文本
+  ![内容](./assets/pop.png)
+  - 摘要
+  - 语法
+  - 解释
+  - 解释代码
+  ![内容](./assets/explain.png)
+  - 重写
+  - 翻译
+- [] 网页内容阅读总结
+  ![内容](./assets/read.png)
