@@ -12,14 +12,11 @@
 
 (function() {
     'use strict';
-    const domain = 'http://localhost:3000/#/';
-    // const domain = 'https://chatgpt-echo.zeabur.app/';
-    window.addEventListener('message', (event) => {
-        console.log('msg', event.data, event);
-        if(event.data.origin && event.data.origin === 'chatgpt-web') {
-            console.log('chatgpt-web', event.data, event);
-        }
-    })
+    // 本地调试ChatGPT的iframe
+    // const domain = 'http://localhost:3000/#/';
+    // 线上ChatGPT的iframe地址
+    const domain = 'https://chatgpt-echo.zeabur.app/';
+    console.log('domain', domain)
 
     // 默认选项
     var defaultOptions = {
@@ -229,7 +226,7 @@
       chatRoom.style.height = '100%';
 
       chatRoom.innerHTML = `
-        <iframe width="99%" height="99%" src="${domain}"></iframe>
+        <iframe id="chatgpt-iframe" width="99%" height="99%" src="${domain}"></iframe>
       `
 
       // 将聊天室添加到侧边栏抽屉中
@@ -408,6 +405,28 @@
         createUI();
         // 初始化配置
         initConfig();
+
+        // 父级，在frame处抛出接收事件
+        window.addEventListener("message", (event) => {
+            // console.log('msg', event.data, event);
+            if(event.data.origin && event.data.origin === 'chatgpt-web') {
+                console.log('chatgpt-web', event.data, event);
+            }
+        }, false);
+
+        document.addEventListener('mouseup', function(e) {
+            let selectionText = window.getSelection().toString();
+            if (selectionText) { // 如果选中的是文本，而不是DOM元素
+                const chatgptIframe = document.getElementById('chatgpt-iframe');
+                console.log('选中了文本：', selectionText, chatgptIframe);
+                chatgptIframe.contentWindow.postMessage({ selectionText, origin: 'parent'}, domain);
+            } else {
+                let selectedElement = document.getSelection().focusNode.parentNode;
+                console.log('选中的元素是：', selectedElement);
+            }
+        });
+
+        // TODO:网页内容读取
     };
 
     // 执行主函数
