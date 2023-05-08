@@ -49,9 +49,11 @@
 
 ## 五、本地测试
 
-1、本地启动：ChatGPT-Tampermonkey
-2、新增 drawIframe.js 油猴脚本，将domain改为：<http://localhost:3000/#/>
-3、修改 drawIframe.js 则编辑油猴脚本，手动复制粘贴；修改ChatGPT聊天室则会自动更新
+- 1、本地启动：ChatGPT-Tampermonkey
+
+- 2、新增 drawIframe.js 油猴脚本，将domain改为：<http://localhost:3000/#/>
+
+- 3、修改 drawIframe.js 则编辑油猴脚本，手动复制粘贴；修改ChatGPT聊天室则会自动更新
 
 ## 六、开发协作
 
