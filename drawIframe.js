@@ -260,6 +260,56 @@
 
       // 美化页面
       GM_addStyle(`
+            .content-root-WCIiJJ {
+                position: absolute;
+                left: 0;
+                top: 0;
+                z-index: 2147483647;
+            }
+            .sidebar-entry-btn-right-doBuCO {
+                right: 0;
+                padding-right: 100px;
+            }
+
+            .sidebar-entry-btn-hvXPZj {
+                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+                color: #212b36;
+                user-select: text;
+                text-align: left;
+                font-weight: 400;
+                cursor: pointer;
+                user-select: none;
+                -webkit-user-drag: none;
+                position: fixed;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                justify-content: left;
+                gap: 6px;
+                bottom: 100px;
+                border: 1px solid #e6eaf2;
+                box-shadow: 0 5px 25px #0000000a, 0 3.2px 12px #00000014;
+                background-color: #fff;
+                height: 40px;
+                padding: 0 8px;
+                border-radius: 32px;
+                transition: all .2s ease-in-out,bottom 0s;
+            }
+            .dialog-root-kux4zc {
+                position: fixed;
+                left: 0;
+                top: 0;
+                z-index: 5000;
+            }
+            .logo-img-COjMQi {
+                -webkit-user-drag: none;
+            }
+            .sidebar-entry-btn-hvXPZj .shortcut--0OZjH {
+                font-size: 16px;
+                font-weight: 500;
+                color: #fff;
+            }
             iframe {
                 border: medium none;
             }
@@ -443,5 +493,5 @@
 
     // 执行主函数
     main();
-    console.log('这是最新代码10');
+    console.log('这是最新代码11');
 })();
