@@ -16,6 +16,9 @@
     // const domain = 'https://chatgpt-echo.zeabur.app/';
     window.addEventListener('message', (event) => {
         console.log('msg', event.data, event);
+        if(event.data.origin && event.data.origin === 'chatgpt-web') {
+            console.log('chatgpt-web', event.data, event);
+        }
     })
 
     // 默认选项
