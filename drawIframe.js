@@ -12,7 +12,11 @@
 
 (function() {
     'use strict';
-    const domain = 'https://chatgpt-echo.zeabur.app/';
+    const domain = 'http://localhost:3000/#/';
+    // const domain = 'https://chatgpt-echo.zeabur.app/';
+    window.addEventListener('message', (event) => {
+        console.log('msg', event.data, event);
+    })
 
     // 默认选项
     var defaultOptions = {
