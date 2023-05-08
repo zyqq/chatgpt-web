@@ -14,7 +14,15 @@
 
 ### 2、autoUpdate.js
 
-放在油猴插件中的代码，会自动更新drawIframe.js中的代码。将其复制到油猴插件中即可。
+放在油猴插件中的代码，会自动更新drawIframe.js中的代码。用于公共仓库。
+
+### 2、autoUpdatePrivate.js
+
+放在油猴插件中的代码，会自动更新drawIframe.js中的代码，用于私有仓库，去仓库中生成accessToken，更新到代码中。
+
+![token](./assets/accessToken.png)
+
+最后将其复制到油猴插件中即可。
 
 ## 三、计划内容
 
@@ -43,7 +51,7 @@
 
 ## 四、如何使用
 
-安装[油猴插件](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)，将autoUpdate.js的代码复制到油猴插件中即可。
+安装[油猴插件](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)，将autoUpdatePrivate.js的代码复制到油猴插件中即可。
 
 ![内容](./assets/script.png)
 
