@@ -16,7 +16,7 @@
   // https://github.com/zyqq/ChatGPT-Tampermonkey.git
   // 仓库信息
   var owner = 'zyqq';
-  var repo = 'ChatGPT-Tampermonkey';
+  var repo = 'chatgpt-web';
 
   // 如果您需要从 Github 拉取私有仓库的代码，您需要做以下几个步骤：
   // 在 Github 上创建一个新的 Personal access token。您可以在 Github 的 Settings 页面中的 Developer settings 下的 Personal access tokens 中创建一个新的 token。在创建 token 时，请确保选择了 repo 权限，以便使用 API 访问私有仓库。

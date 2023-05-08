@@ -172,32 +172,20 @@
     var createUI = function() {
       // 创建悬浮按钮
       var button = document.createElement('div');
-      button.innerHTML = `
-        <div id="customization-button" class="content-root-WCIiJJ">
-            <div class="sidebar-entry-btn-hvXPZj sidebar-entry-btn-right-doBuCO" data-id="1" style="transform: translateX(128px); bottom: 147.6px; display: flex;">
-                <img 
-                    src="https://hoit.uk/wp-content/uploads/2023/01/ChatGPT.png" 
-                    class="logo-img-COjMQi" 
-                    style="width: 24px; height: 24px; border-radius: 4px;"
-                >
-                <span class="shortcut--0OZjH">⌘M</span>
-            </div>
-            <div class="dialog-root-kux4zc"></div>
-        </div>`
-    //   button.id = 'customization-button';
-    //   button.style.position = 'fixed';
-    //   button.style.bottom = '20px';
-    //   button.style.right = '20px';
-    //   button.style.width = '50px';
-    //   button.style.height = '50px';
-    //   button.style.borderRadius = '50%';
-    //   button.style.backgroundColor = '#409EFF';
-    //   button.style.color = '#fff';
-    //   button.style.fontSize = '24px';
-    //   button.style.textAlign = 'center';
-    //   button.style.lineHeight = '50px';
-    //   button.style.cursor = 'pointer';
-    //   button.textContent = '⚙';
+      button.id = 'customization-button';
+      button.style.position = 'fixed';
+      button.style.bottom = '20px';
+      button.style.right = '20px';
+      button.style.width = '50px';
+      button.style.height = '50px';
+      button.style.borderRadius = '50%';
+      button.style.backgroundColor = '#409EFF';
+      button.style.color = '#fff';
+      button.style.fontSize = '24px';
+      button.style.textAlign = 'center';
+      button.style.lineHeight = '50px';
+      button.style.cursor = 'pointer';
+      button.textContent = '⚙';
 
       // 创建侧边栏抽屉
       var drawer = document.createElement('div');
@@ -260,56 +248,6 @@
 
       // 美化页面
       GM_addStyle(`
-            .content-root-WCIiJJ {
-                position: absolute;
-                left: 0;
-                top: 0;
-                z-index: 2147483647;
-            }
-            .sidebar-entry-btn-right-doBuCO {
-                right: 0;
-                padding-right: 100px;
-            }
-
-            .sidebar-entry-btn-hvXPZj {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
-                color: #212b36;
-                user-select: text;
-                text-align: left;
-                font-weight: 400;
-                cursor: pointer;
-                user-select: none;
-                -webkit-user-drag: none;
-                position: fixed;
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
-                justify-content: left;
-                gap: 6px;
-                bottom: 100px;
-                border: 1px solid #e6eaf2;
-                box-shadow: 0 5px 25px #0000000a, 0 3.2px 12px #00000014;
-                background-color: #fff;
-                height: 40px;
-                padding: 0 8px;
-                border-radius: 32px;
-                transition: all .2s ease-in-out,bottom 0s;
-            }
-            .dialog-root-kux4zc {
-                position: fixed;
-                left: 0;
-                top: 0;
-                z-index: 5000;
-            }
-            .logo-img-COjMQi {
-                -webkit-user-drag: none;
-            }
-            .sidebar-entry-btn-hvXPZj .shortcut--0OZjH {
-                font-size: 16px;
-                font-weight: 500;
-                color: #fff;
-            }
             iframe {
                 border: medium none;
             }
@@ -493,5 +431,5 @@
 
     // 执行主函数
     main();
-    console.log('这是最新代码11');
+    console.log('这是最新代码10');
 })();
