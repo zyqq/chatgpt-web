@@ -2,8 +2,6 @@
 
 ## 一、简介
 
-> 油猴插件下载地址：<https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo>
-
 这是一个定制网页的油猴脚本插件相关代码，展示如下：
 ![插件](./assets/plugins.png)
 ![内容](./assets/chatgpt-iframe.png)
@@ -17,8 +15,6 @@
 ### 2、autoUpdate.js
 
 放在油猴插件中的代码，会自动更新drawIframe.js中的代码。将其复制到油猴插件中即可。
-
-![内容](./assets/script.png)
 
 ## 三、计划内容
 
@@ -37,3 +33,26 @@
   - 翻译
 - [] 网页内容阅读总结
   ![内容](./assets/read.png)
+
+## 四、如何使用
+
+安装[油猴插件](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)，将autoUpdate.js的代码复制到油猴插件中即可。
+
+![内容](./assets/script.png)
+
+## 五、本地测试
+
+1、本地启动：ChatGPT-Tampermonkey
+2、新增 drawIframe.js 油猴脚本，将domain改为：<http://localhost:3000/#/>
+3、修改 drawIframe.js 则编辑油猴脚本，手动复制粘贴；修改ChatGPT聊天室则会自动更新
+
+## 六、开发协作
+
+- 从 main 新建分支，命名规范为：[name]/[feature|fix]/[修改点]
+- 提 mr 到 main
+
+油猴脚本代码会自动更新拉取 drawIframe.js 代码
+
+## 七、联系方式
+
+邮箱：252545095@qq.com
