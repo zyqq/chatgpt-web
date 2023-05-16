@@ -1,9 +1,15 @@
 // ==UserScript==
-// @name         网页定制（ChatGPT版）
-// @namespace    your-namespace
-// @version      1
+// @name         网页定制（ChatGPT版）自动更新
+// @author       yiqiuzheng
 // @description  自动生成网页定制脚本，支持深色模式、隐藏元素等功能，自动拉取更新脚本代码
-// @match        https://*/*
+// @namespace    http://tampermonkey.net/
+// @version      1.1
+// @updateURL    https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
+// @downloadURL  https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
+// @match        http*://*/*
+// @exclude      https://chatgpt-echo.zeabur.app/*
+// @exclude      https://graph.qq.com/*
+// @exclude      https://open.weixin.qq.com/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
