@@ -7,6 +7,9 @@
 // @updateURL    https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @downloadURL  https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @match        http*://*/*
+// @exclude      https://chatgpt-echo.zeabur.app/*
+// @exclude      https://graph.qq.com/*
+// @exclude      https://open.weixin.qq.com/*
 // @grant        GM_addStyle
 // ==/UserScript==
 
