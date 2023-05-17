@@ -29,18 +29,21 @@
 - ✅ ChatGPT交互
 - [] 支持搜索同时也询问ChatGPT
 
-  ![内容](./assets/search.png)
+  <img src="./assets/search.png" width="400px" />
 - [] 网页内容阅读总结
 
-  ![内容](./assets/read.png)
+  <img src="./assets/read.png" width="200px" />
 - [] 选中文本
 
-  ![内容](./assets/pop.png)
+  <img src="./assets/pop.png" width="100px" />
+
   - 摘要
   - 语法
   - 解释
   - 解释代码
-  ![内容](./assets/explain.png)
+  
+  <img src="./assets/explain.png" width="200px" />
+
   - 重写
   - 翻译
 - [] 油猴脚本助手（已生成prompt模板，待完善30%）
