@@ -251,6 +251,9 @@
 
       // 美化页面
       GM_addStyle(`
+            #customization-chat-room {
+                border-left: 1px solid #e5e8eb;
+            }
             iframe {
                 border: medium none;
             }
