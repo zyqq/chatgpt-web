@@ -524,7 +524,7 @@
     const result = getArticleText();
     console.log(result);
     const splitStr = (str) => {
-        const maxLength = 4500; // 每个字符串的最大长度
+        const maxLength = 4400; // 每个字符串的最大长度
         const strArr = []; // 存放切割后的字符串数组
         let temp = ""; // 临时变量用来拼接字符串
         for (let i = 0; i < str.length; i++) {
