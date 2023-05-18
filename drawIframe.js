@@ -427,7 +427,7 @@
                 console.log('选中了文本：', selectionText, chatgptIframe);
                 chatgptIframe.contentWindow.postMessage({ selectionText, origin: 'parent'}, domain);
             } else {
-                let selectedElement = document.getSelection().focusNode.parentNode;
+                let selectedElement = document.getSelection()?.focusNode?.parentNode;
                 console.log('选中的元素是：', selectedElement);
             }
         });
