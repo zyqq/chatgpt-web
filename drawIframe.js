@@ -230,6 +230,10 @@
 
       chatRoom.innerHTML = `
         <iframe id="chatgpt-iframe" width="99%" height="99%" src="${domain}"></iframe>
+        <noframes>
+            <p>抱歉，由于某些原因，无法加载此内容。</p>
+            <p>请跳转网页版体验：https://chatgpt-echo.zeabur.app/</p>
+        </noframes>
       `
 
       // 将聊天室添加到侧边栏抽屉中
