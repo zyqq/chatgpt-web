@@ -230,10 +230,6 @@
 
       chatRoom.innerHTML = `
         <iframe id="chatgpt-iframe" width="99%" height="99%" src="${domain}"></iframe>
-        <noframes>
-            <p>抱歉，由于某些原因，无法加载此内容。</p>
-            <p>请跳转网页版体验：https://chatgpt-echo.zeabur.app/</p>
-        </noframes>
       `
 
       // 将聊天室添加到侧边栏抽屉中
@@ -435,6 +431,17 @@
                 console.log('选中的元素是：', selectedElement);
             }
         });
+
+        const iframe = document.getElementById("chatgpt-iframe");
+
+        iframe.onerror = function () {
+            // iframe 加载失败
+           const chatRoom = document.getElementById('customization-chat-room');
+           chatRoom.innerHTML = `
+            <p>抱歉，由于某些原因，无法加载此内容。</p>
+            <p>请跳转网页版体验：https://chatgpt-echo.zeabur.app/。</p>
+           `
+        };
 
         // TODO:网页内容读取
     };
