@@ -19,10 +19,23 @@
 (function () {
   'use strict';
   // 本地调试ChatGPT的iframe
-  // const domain = 'http://localhost:3000/#/';
+  const domain = 'http://localhost:3000/#/';
   // 线上ChatGPT的iframe地址
-    const domain = 'https://chatgpt-echo.zeabur.app/';
+    // const domain = 'https://chatgpt-echo.zeabur.app/';
   console.log('domain', domain);
+
+  const isDomain = (platform) => {
+    return window.location.host === `www.${platform}.com`;
+  }
+  const getSearchContent = () => {
+    if(isDomain('baidu')) {
+      return document.getElementById('kw').value;
+    } else if(isDomain('google')) {
+      return document.getElementById('APjFqb').innerHTML;
+    } else {
+      return ''
+    }
+  }
 
   // 默认选项
   var defaultOptions = {
@@ -417,6 +430,7 @@
   const generateSearchEnhance = () => {
     const messageWrapper = document.createElement('div');
     messageWrapper.className = 'chatgpt-search-enhance';
+    messageWrapper.id = 'chatgpt-search-enhance';
     messageWrapper.innerHTML = `
         <div class="header-7QHGYk">
           <div class="lt-znd2I9">
@@ -426,30 +440,26 @@
             </a>
           </div>
           <div class="rt-FR4JFM">
+            <div id="toolbar" class="toolbar">
+              <span class="toolbar-item-EhZYV5">
+                <svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;">
+                  <g><path fill="currentColor" d="M6.667 4.814 4.402 6.667H2v2.667h2.402l2.265 1.853V4.814Zm-2.741 5.853H1.333A.666.666 0 0 1 .667 10V6a.667.667 0 0 1 .666-.666h2.593l3.53-2.888A.333.333 0 0 1 8 2.704v10.593a.333.333 0 0 1-.545.258l-3.528-2.888h-.001Zm9.011 2.756-.944-.944A5.985 5.985 0 0 0 14 8a5.988 5.988 0 0 0-2.203-4.645l.947-.947A7.317 7.317 0 0 1 15.334 8a7.315 7.315 0 0 1-2.397 5.423Zm-2.362-2.362-.948-.948A2.662 2.662 0 0 0 10.667 8c0-.953-.5-1.79-1.254-2.261l.96-.96A3.995 3.995 0 0 1 12 8a3.991 3.991 0 0 1-1.425 3.061Z" data-follow-fill="#838BA7"></path></g></svg>
+              </span>
+              <span class="toolbar-item-EhZYV5"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M12.243 12.243a6 6 0 1 1 0-8.485C12.795 4.31 14 5.666 14 5.666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M14 2.668v3h-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg></span><span class="toolbar-item-EhZYV5"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M4.334 4.145v-1.54c0-.517.42-.937.937-.937h8.125c.518 0 .938.42.938.937v8.125c0 .518-.42.938-.938.938H11.84" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M10.729 4.332H2.604a.937.937 0 0 0-.938.938v8.125c0 .517.42.937.938.937h8.125c.517 0 .937-.42.937-.938V5.27a.937.937 0 0 0-.938-.938Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"></path></g>
+                </svg>
+              </span>
+            </div>
             <div class="mode-GtcyE3">
               <div class="mode-box-5-6c1L">
-                <div class="title-N8X-fJ">询问 ChatGPT</div>
+                <div id="searchChatGPT" class="title-N8X-fJ">询问 ChatGPT</div>
               </div>
             </div>
           </div>
         </div>
-        <div class="answer">
+        <div id="answer" class="answer">
         </div>
+        <div id="footer" class="footer"><div class="monica-btn btn continue-chat primary-outline-button"><svg aria-hidden="true" focusable="false" role="img" class="octicon octicon-comment" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" style="display: inline-block; user-select: none; vertical-align: text-bottom; overflow: visible;"><path d="M1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0 1 13.25 12H9.06l-2.573 2.573A1.458 1.458 0 0 1 4 13.543V12H2.75A1.75 1.75 0 0 1 1 10.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h4.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg><span class="text">在聊天中继续</span></div></div>
     `;
-    const footer = document.createElement('div');
-    footer.className = 'footer';
-    footer.innerHTML = `
-        <div class="footer"><div class="monica-btn btn continue-chat primary-outline-button"><svg aria-hidden="true" focusable="false" role="img" class="octicon octicon-comment" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" style="display: inline-block; user-select: none; vertical-align: text-bottom; overflow: visible;"><path d="M1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0 1 13.25 12H9.06l-2.573 2.573A1.458 1.458 0 0 1 4 13.543V12H2.75A1.75 1.75 0 0 1 1 10.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h4.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg><span class="text">在聊天中继续</span></div></div>
-    `
-    const toolbar = document.createElement('div');
-    toolbar.className = 'toolbar';
-    toolbar.innerHTML = `
-      <span class="toolbar-item-EhZYV5">
-        <svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;">
-          <g><path fill="currentColor" d="M6.667 4.814 4.402 6.667H2v2.667h2.402l2.265 1.853V4.814Zm-2.741 5.853H1.333A.666.666 0 0 1 .667 10V6a.667.667 0 0 1 .666-.666h2.593l3.53-2.888A.333.333 0 0 1 8 2.704v10.593a.333.333 0 0 1-.545.258l-3.528-2.888h-.001Zm9.011 2.756-.944-.944A5.985 5.985 0 0 0 14 8a5.988 5.988 0 0 0-2.203-4.645l.947-.947A7.317 7.317 0 0 1 15.334 8a7.315 7.315 0 0 1-2.397 5.423Zm-2.362-2.362-.948-.948A2.662 2.662 0 0 0 10.667 8c0-.953-.5-1.79-1.254-2.261l.96-.96A3.995 3.995 0 0 1 12 8a3.991 3.991 0 0 1-1.425 3.061Z" data-follow-fill="#838BA7"></path></g></svg></span><span class="toolbar-item-EhZYV5"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M12.243 12.243a6 6 0 1 1 0-8.485C12.795 4.31 14 5.666 14 5.666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M14 2.668v3h-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg></span><span class="toolbar-item-EhZYV5"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M4.334 4.145v-1.54c0-.517.42-.937.937-.937h8.125c.518 0 .938.42.938.937v8.125c0 .518-.42.938-.938.938H11.84" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M10.729 4.332H2.604a.937.937 0 0 0-.938.938v8.125c0 .517.42.937.938.937h8.125c.517 0 .937-.42.937-.938V5.27a.937.937 0 0 0-.938-.938Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"></path></g>
-        </svg>
-      </span>
-    `
     GM_addStyle(`
       .chatgpt-search-enhance {
         border-radius: 8px;
@@ -488,7 +498,7 @@
           height: 24px;
       }
       .toolbar {
-          display: inline-flex;
+          display: none;
           align-items: center;
           gap: 8px;
           color: #595959;
@@ -542,9 +552,9 @@
       }
       .footer {
         box-sizing: border-box;
-        display: flex;
+        display: none;
         align-items: center;
-        margin-bottom: 16px;
+        margin: 16px 0;
       }
       .footer .continue-chat {
           height: 32px;
@@ -579,8 +589,12 @@
           margin-left: 8px;
       }
     `);
-    const searchBox = document.getElementById('rhs');
+    const searchBox = document.getElementById(isDomain('google') ? 'rhs' : 'content_right');
     searchBox?.appendChild(messageWrapper);
+    const searchChatGPT = document.getElementById('searchChatGPT');
+    searchChatGPT.addEventListener('click', () => {
+      postMsg({ type: 'search', content: getSearchContent() })
+    })
   };
 
   // 谷歌搜索ChatGPT应答
@@ -740,6 +754,11 @@
             const article = extractArticle();
             postMsg({ type: 'read', content: article });
           }
+          if(event.data.type === 'search') {
+            document.getElementById('answer').innerHTML = event.data.data.content;
+            document.getElementById('footer').style.display = 'flex';
+            document.getElementById('toolbar').style.display = 'inline-flex';
+          }
         }
       },
       false
@@ -785,7 +804,7 @@
     };
 
     // TODO:网页内容读取
-    if (window.location.host === 'www.google.com') {
+    if (isDomain('google') || isDomain('baidu')) {
       handleGoogleSearch();
     }
   };
