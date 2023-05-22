@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name         网页定制（ChatGPT版）
 // @author       yiqiuzheng
+// @version      2023.05.20.01
 // @description  自动生成网页定制脚本，支持深色模式、隐藏元素等功能
+// @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAH1UExURUxpcXeqn3WqnHWonHSpnHWonHWpnG22knWpnHWpnHSmm3apm3SpnHWonHWpnHSonHWpnHWpm3apnXWpnHWpm3WpnP///8fc19fm43mrn67Nxf7///r8+6HFvNPk4JS8ssXb1XirnsDY0sPa1Pj7+qbHv5i/tXeqnvz9/X6uoo65roq2q+Tu7P3+/qrKwqDEu9bm4vP39qfIwPv9/NXl4ezz8Xqsn+nx73msn5/Dusnd2N7q59zp5pC6r4CwpKLFvIOxpszf2oSypsTa1fn7+/P49t/r6JrAt8LZ1L/X0d3q53aqnczf287h3Ie0qc7g3Pr8/LTQybDOxpvBuObv7c/h3PX5+Ory8ODr6OPt65G7sLnTzYWzp/n7+oi1qv7+/tTk4J7Cucve2Z3Cub7X0H+vo8LZ053CuKnJwff6+tnn4/3+/fD29XytoYWzqJe+tJa+tHapnHeqnaHEu8vf2oGxpazLw3utoMre2ZW9s7XRyu/19H2uou/186XHv6jJwNDi3sjd2OLt6u308ufw7tfm4rjTzK3MxOjw7tvp5dHi3sjd15m/tvL39q/Nxvb5+OPu64y3rIOyptnn5LbSy+Ds6eHs6tbl4cHZ0/v8/H6vo4GwpZ7Dus/h3fb6+ZK7sfT49/f6+aLFvavLw6zLxM3g28bc1pQLf2QAAAAVdFJOUwAtv5bz1PQH/dUuj5WQ/CyYwJHykqKEGP8AAAAJcEhZcwAAAHYAAAB2AU57JggAAAIcSURBVDjLhdNle9swEABgFdK0Kw7uHMfp6iTeAksaThpoUmZuV1x5zMxbx8wM7Xj7nZNjx/L2rNl9kXR6H51snwmhsWFTWQn8FSWGygKihLGmFP4ZpUXG7P5GWDcKZVEDeaKC1mfnHxUvoSV19YQOVFWTLdpiUfJ2POx/jOEzAy4tWU7KctPG95FpOjT0IA2PT80aSHEOpKQ5mSUxIA7bD2OzI5vdTNTt1QXBDvAxMT/7qkE+h8PdyoYC+DX0YgYyX4W+FwBunqYOhpp0YAl/1eN22Or5DPD8Jd6sBTiOZgYa8SfUysAMH+wWW/AK3ndbUWRADKUVMGIex1YrRGcs3uvYxcCzKVCAJTb66FZsFGDXTgHPMjD2WgWcFeCkHd/uoOshj0MD16QoLOI2+Q406ifpPXh4gisaOIXD4JiZXUoqwARx/Ab80zB7TJMzmK17nr4BK2eCOnocJGMMBBH9tO6FqYhveUJSwZsxBrpRDDltl6G3G7/8+K6AtLOZARu65hYwcLfL8s4l30EGCTzGwH6MA3Tew9u0Tp1HBmYOT+u+xZ62nl4AB91uGRQ+ZWAZ53HQqgMwgn3n6BC90+bl0nLJB51qH+QaphUD3EWuHVNuuhiQwlrPaS3n6zhEW+2G3I3TkSE3A5XalG860o/j/sSkcGAf62tS8MdvFfe3Oyf2tugyhBRB3qC/XuF/ADFWVOUHhFSXG4rXA78BYbiLJDUXqsMAAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII=
 // @namespace    http://tampermonkey.net/
 // @version      1.1
 // @updateURL    https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
@@ -11,6 +13,7 @@
 // @exclude      https://graph.qq.com/*
 // @exclude      https://open.weixin.qq.com/*
 // @grant        GM_addStyle
+// @run-at         document-end
 // ==/UserScript==
 
 (function () {
@@ -18,7 +21,7 @@
   // 本地调试ChatGPT的iframe
   // const domain = 'http://localhost:3000/#/';
   // 线上ChatGPT的iframe地址
-  const domain = 'https://chatgpt-echo.zeabur.app/';
+    const domain = 'https://chatgpt-echo.zeabur.app/';
   console.log('domain', domain);
 
   // 默认选项
@@ -410,13 +413,180 @@
     }
   };
 
+  const generateSearchEnhance = () => {
+    const messageWrapper = document.createElement('div');
+    messageWrapper.className = 'chatgpt-search-enhance';
+    messageWrapper.innerHTML = `
+        <div class="header-7QHGYk">
+          <div class="lt-znd2I9">
+            <a class="title-N8X-fJ" href="${domain}" target="_blank" rel="noreferrer">
+              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" fill="none" class="user-avatar"><defs><path id="bot_svg__a" d="M0 0h30v30H0z"></path><path id="bot_svg__c" d="M0 0h20.455v20.455H0z"></path></defs><g><rect fill="#E7F8FF" width="30" height="30" rx="10"></rect><mask id="bot_svg__b" fill="#fff"><use xlink:href="#bot_svg__a"></use></mask><g mask="url(#bot_svg__b)"><g transform="translate(4.773 4.773)"><mask id="bot_svg__d" fill="#fff"><use xlink:href="#bot_svg__c"></use></mask><g mask="url(#bot_svg__d)"><path fill-rule="evenodd" d="M19.11 8.37c.17-.52.26-1.06.26-1.61 0-.9-.24-1.79-.71-2.57a5.24 5.24 0 0 0-4.53-2.59c-.37 0-.73.04-1.09.11A5.201 5.201 0 0 0 9.17 0h-.04C6.86 0 4.86 1.44 4.16 3.57A5.11 5.11 0 0 0 .71 6.04C.24 6.83 0 7.72 0 8.63c0 1.27.48 2.51 1.35 3.45-.18.52-.27 1.07-.27 1.61 0 .91.25 1.8.71 2.58 1.13 1.94 3.41 2.94 5.63 2.47a5.18 5.18 0 0 0 3.86 1.71h.05c2.26 0 4.27-1.44 4.97-3.57a5.132 5.132 0 0 0 3.45-2.47c.46-.78.7-1.67.7-2.58 0-1.28-.48-2.51-1.34-3.46ZM8.947 18.158c-.04.03-.08.05-.12.07.7.58 1.57.89 2.48.89h.01c2.14 0 3.88-1.72 3.88-3.83v-4.76c0-.02-.02-.04-.04-.05l-1.74-.99v5.75c0 .23-.13.45-.34.57l-4.13 2.35Zm-.67-1.153 4.17-2.38c.02-.01.03-.03.03-.05v-1.99l-5.04 2.87c-.21.12-.47.12-.68 0l-4.13-2.35c-.04-.02-.09-.06-.12-.07-.04.21-.06.43-.06.65 0 .67.18 1.33.52 1.92v-.01c.7 1.19 1.98 1.92 3.37 1.92.68 0 1.35-.18 1.94-.51ZM3.903 5.168v-.14c-.85.31-1.57.9-2.02 1.68a3.78 3.78 0 0 0-.52 1.91c0 1.37.74 2.64 1.94 3.33l4.17 2.37c.02.01.04.01.06 0l1.75-1-5.04-2.87a.64.64 0 0 1-.34-.57v-4.71Zm13.253 3.337-4.18-2.38c-.02 0-.04 0-.06.01l-1.74.99 5.04 2.87c.21.12.34.34.34.58v4.85c1.52-.56 2.54-1.99 2.54-3.6 0-1.37-.74-2.63-1.94-3.32ZM8.014 5.83c-.02.01-.03.03-.03.05v1.99L13.024 5a.692.692 0 0 1 .68 0l4.13 2.35c.04.02.08.05.12.07.03-.21.05-.43.05-.65 0-2.11-1.74-3.83-3.88-3.83-.68 0-1.35.18-1.94.51l-4.17 2.38Zm1.133-4.492c-2.15 0-3.89 1.72-3.89 3.83v4.76c0 .02.02.03.03.04l1.75 1v-5.75c0-.23.13-.45.34-.57l4.13-2.35c.04-.03.09-.06.12-.07-.7-.58-1.58-.89-2.48-.89ZM7.983 11.51l2.24 1.27 2.25-1.27V8.95l-2.25-1.28-2.24 1.28v2.56Z" style="fill: rgb(31, 148, 140);"></path></g></g></g></g></svg>
+              <span>ChatGPT</span>
+            </a>
+          </div>
+          <div class="rt-FR4JFM">
+            <div class="mode-GtcyE3">
+              <div class="mode-box-5-6c1L">
+                <div class="title-N8X-fJ">询问 ChatGPT</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="answer">
+        </div>
+    `;
+    const footer = document.createElement('div');
+    footer.className = 'footer';
+    footer.innerHTML = `
+        <div class="footer"><div class="monica-btn btn continue-chat primary-outline-button"><svg aria-hidden="true" focusable="false" role="img" class="octicon octicon-comment" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" style="display: inline-block; user-select: none; vertical-align: text-bottom; overflow: visible;"><path d="M1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0 1 13.25 12H9.06l-2.573 2.573A1.458 1.458 0 0 1 4 13.543V12H2.75A1.75 1.75 0 0 1 1 10.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h4.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg><span class="text">在聊天中继续</span></div></div>
+    `
+    const toolbar = document.createElement('div');
+    toolbar.className = 'toolbar';
+    toolbar.innerHTML = `
+      <span class="toolbar-item-EhZYV5">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;">
+          <g><path fill="currentColor" d="M6.667 4.814 4.402 6.667H2v2.667h2.402l2.265 1.853V4.814Zm-2.741 5.853H1.333A.666.666 0 0 1 .667 10V6a.667.667 0 0 1 .666-.666h2.593l3.53-2.888A.333.333 0 0 1 8 2.704v10.593a.333.333 0 0 1-.545.258l-3.528-2.888h-.001Zm9.011 2.756-.944-.944A5.985 5.985 0 0 0 14 8a5.988 5.988 0 0 0-2.203-4.645l.947-.947A7.317 7.317 0 0 1 15.334 8a7.315 7.315 0 0 1-2.397 5.423Zm-2.362-2.362-.948-.948A2.662 2.662 0 0 0 10.667 8c0-.953-.5-1.79-1.254-2.261l.96-.96A3.995 3.995 0 0 1 12 8a3.991 3.991 0 0 1-1.425 3.061Z" data-follow-fill="#838BA7"></path></g></svg></span><span class="toolbar-item-EhZYV5"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M12.243 12.243a6 6 0 1 1 0-8.485C12.795 4.31 14 5.666 14 5.666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M14 2.668v3h-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg></span><span class="toolbar-item-EhZYV5"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M4.334 4.145v-1.54c0-.517.42-.937.937-.937h8.125c.518 0 .938.42.938.937v8.125c0 .518-.42.938-.938.938H11.84" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M10.729 4.332H2.604a.937.937 0 0 0-.938.938v8.125c0 .517.42.937.938.937h8.125c.517 0 .937-.42.937-.938V5.27a.937.937 0 0 0-.938-.938Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"></path></g>
+        </svg>
+      </span>
+    `
+    GM_addStyle(`
+      .chatgpt-search-enhance {
+        border-radius: 8px;
+        border: 1px solid #dadce0;
+        padding: 0 16px;
+      }
+      .chatgpt-search-enhance .header-7QHGYk {
+          height: 56px;
+          display: flex;
+          box-sizing: border-box;
+      }
+      .header-7QHGYk .lt-znd2I9 .title-N8X-fJ span {
+        font-size: 15px;
+        color: #000;
+        font-weight: 700;
+    }
+      .chatgpt-search-enhance .header-7QHGYk .lt-znd2I9 {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+      }
+      .chatgpt-search-enhance .header-7QHGYk .lt-znd2I9 .title-N8X-fJ {
+          display: inline-flex;
+          align-items: center;
+          cursor: pointer;
+          gap: 6px;
+      }
+      .chatgpt-search-enhance .header-7QHGYk .rt-FR4JFM {
+          flex: 1;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 8px;
+      }
+      .chatgpt-search-enhance .header-7QHGYk .rt-FR4JFM .mode-GtcyE3 {
+          height: 24px;
+      }
+      .toolbar {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          color: #595959;
+      }
+      .chatgpt-search-enhance .header-7QHGYk .rt-FR4JFM .mode-GtcyE3 .mode-box-5-6c1L {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          box-sizing: border-box;
+          border: 1px solid #611fec;
+          box-shadow: 0 2px #611fec;
+          border-radius: 6px;
+          background: rgba(255,255,255,.45);
+          transition: background-color .2s ease,top .1s ease,box-shadow .1s ease;
+          color: #212b36;
+          cursor: pointer;
+          user-select: none;
+          -webkit-user-drag: none;
+          position: relative;
+          top: -1px;
+      }
+      .chatgpt-search-enhance .header-7QHGYk .rt-FR4JFM .mode-GtcyE3 .mode-box-5-6c1L .title-N8X-fJ {
+          flex: 1;
+          height: 100%;
+          line-height: 24px;
+          font-weight: 700;
+          box-sizing: border-box;
+          padding: 0 4px 0 8px;
+          min-width: 0;
+          max-width: 150px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          text-align: center;
+          border-radius: 4px 0 0 4px;
+          transition: all .2s ease-in-out;
+      }
+      .title-N8X-fJ:hover {
+          background: rgba(235,202,254,.24);
+      }
+      .footer {
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .footer .continue-chat {
+          height: 32px;
+          border-radius: 16px;
+          font-weight: 400;
+      }
+      .primary-outline-button.btn {
+          background: #ffffff;
+          border: 1px solid rgba(56,114,224,.48);
+          border-radius: 6px;
+          align-items: center;
+          height: 36px;
+          display: flex;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 14px;
+          color: #3872e0;
+          line-height: 24px;
+      }
+      .primary-outline-button.btn:hover {
+          background: #eff3ff;
+      }
+      .monica-btn {
+          box-sizing: border-box;
+          padding: 0 15px;
+          cursor: pointer;
+          user-select: none;
+          -webkit-user-drag: none;
+          white-space: nowrap;
+      }
+      .footer .continue-chat .text {
+          margin-left: 8px;
+      }
+    `);
+    const searchBox = document.getElementById('rhs');
+    searchBox?.appendChild(messageWrapper);
+  };
+
+  // 谷歌搜索ChatGPT应答
+  const handleGoogleSearch = () => {
+    window.addEventListener('load', () => {
+      generateSearchEnhance();
+    });
+  };
+
   const postMsg = ({ type, ...data }) => {
     const chatgptIframe = document.getElementById('chatgpt-iframe');
     chatgptIframe.contentWindow.postMessage(
-            { data, type, origin: 'parent' },
-            domain
-        );
-  }
+      { data, type, origin: 'parent' },
+      domain
+    );
+  };
 
   const extractArticle = () => {
     // 判断节点是否是文本节点
@@ -524,20 +694,21 @@
     const result = getArticleText();
     console.log(result);
     const splitStr = (str) => {
-        const maxLength = 4400; // 每个字符串的最大长度
-        const strArr = []; // 存放切割后的字符串数组
-        let temp = ""; // 临时变量用来拼接字符串
-        for (let i = 0; i < str.length; i++) {
+      const maxLength = 4400; // 每个字符串的最大长度
+      const strArr = []; // 存放切割后的字符串数组
+      let temp = ''; // 临时变量用来拼接字符串
+      for (let i = 0; i < str.length; i++) {
         temp += str[i];
-        if ((i + 1) % maxLength === 0 || i === str.length - 1) { // 到达最大长度，或者到达字符串最后
-            strArr.push(temp);
-            temp = "";
+        if ((i + 1) % maxLength === 0 || i === str.length - 1) {
+          // 到达最大长度，或者到达字符串最后
+          strArr.push(temp);
+          temp = '';
         }
-        }
-        return strArr; 
-    }
-    const formatResult = splitStr(result)
-    console.log('formatResult', formatResult)
+      }
+      return strArr;
+    };
+    const formatResult = splitStr(result);
+    console.log('formatResult', formatResult);
     return formatResult;
   };
 
@@ -557,7 +728,7 @@
           if (event.data.type === 'read') {
             console.log('阅读文章');
             const article = extractArticle();
-            postMsg({ type: 'read', content: article })
+            postMsg({ type: 'read', content: article });
           }
         }
       },
@@ -585,7 +756,7 @@
         //   { selectionText, origin: 'parent' },
         //   domain
         // );
-        postMsg({ type: 'selectText', content: selectionText })
+        postMsg({ type: 'selectText', content: selectionText });
       } else {
         let selectedElement = document.getSelection()?.focusNode?.parentNode;
         console.log('选中的元素是：', selectedElement);
@@ -599,11 +770,14 @@
       const chatRoom = document.getElementById('customization-chat-room');
       chatRoom.innerHTML = `
             <p>抱歉，由于某些原因，无法加载此内容。</p>
-            <p>请跳转网页版体验：https://chatgpt-echo.zeabur.app/。</p>
+            <p>请跳转网页版体验：${domain}。</p>
            `;
     };
 
     // TODO:网页内容读取
+    if (window.location.host === 'www.google.com') {
+      handleGoogleSearch();
+    }
   };
 
   // 执行主函数
