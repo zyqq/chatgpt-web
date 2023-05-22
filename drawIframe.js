@@ -413,6 +413,7 @@
     }
   };
 
+  // 谷歌搜索ChatGPT应答
   const generateSearchEnhance = () => {
     const messageWrapper = document.createElement('div');
     messageWrapper.className = 'chatgpt-search-enhance';
@@ -528,7 +529,16 @@
           transition: all .2s ease-in-out;
       }
       .title-N8X-fJ:hover {
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-drag: none;
+        text-decoration: none;
+        color: #3872e0!important;
+        background-color: transparent;
+      }
+      .mode-box-5-6c1L .title-N8X-fJ:hover {
           background: rgba(235,202,254,.24);
+          text-decoration: none!important;
       }
       .footer {
         box-sizing: border-box;
