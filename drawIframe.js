@@ -5,7 +5,6 @@
 // @description  自动生成网页定制脚本，支持深色模式、隐藏元素等功能
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAH1UExURUxpcXeqn3WqnHWonHSpnHWonHWpnG22knWpnHWpnHSmm3apm3SpnHWonHWpnHSonHWpnHWpm3apnXWpnHWpm3WpnP///8fc19fm43mrn67Nxf7///r8+6HFvNPk4JS8ssXb1XirnsDY0sPa1Pj7+qbHv5i/tXeqnvz9/X6uoo65roq2q+Tu7P3+/qrKwqDEu9bm4vP39qfIwPv9/NXl4ezz8Xqsn+nx73msn5/Dusnd2N7q59zp5pC6r4CwpKLFvIOxpszf2oSypsTa1fn7+/P49t/r6JrAt8LZ1L/X0d3q53aqnczf287h3Ie0qc7g3Pr8/LTQybDOxpvBuObv7c/h3PX5+Ory8ODr6OPt65G7sLnTzYWzp/n7+oi1qv7+/tTk4J7Cucve2Z3Cub7X0H+vo8LZ053CuKnJwff6+tnn4/3+/fD29XytoYWzqJe+tJa+tHapnHeqnaHEu8vf2oGxpazLw3utoMre2ZW9s7XRyu/19H2uou/186XHv6jJwNDi3sjd2OLt6u308ufw7tfm4rjTzK3MxOjw7tvp5dHi3sjd15m/tvL39q/Nxvb5+OPu64y3rIOyptnn5LbSy+Ds6eHs6tbl4cHZ0/v8/H6vo4GwpZ7Dus/h3fb6+ZK7sfT49/f6+aLFvavLw6zLxM3g28bc1pQLf2QAAAAVdFJOUwAtv5bz1PQH/dUuj5WQ/CyYwJHykqKEGP8AAAAJcEhZcwAAAHYAAAB2AU57JggAAAIcSURBVDjLhdNle9swEABgFdK0Kw7uHMfp6iTeAksaThpoUmZuV1x5zMxbx8wM7Xj7nZNjx/L2rNl9kXR6H51snwmhsWFTWQn8FSWGygKihLGmFP4ZpUXG7P5GWDcKZVEDeaKC1mfnHxUvoSV19YQOVFWTLdpiUfJ2POx/jOEzAy4tWU7KctPG95FpOjT0IA2PT80aSHEOpKQ5mSUxIA7bD2OzI5vdTNTt1QXBDvAxMT/7qkE+h8PdyoYC+DX0YgYyX4W+FwBunqYOhpp0YAl/1eN22Or5DPD8Jd6sBTiOZgYa8SfUysAMH+wWW/AK3ndbUWRADKUVMGIex1YrRGcs3uvYxcCzKVCAJTb66FZsFGDXTgHPMjD2WgWcFeCkHd/uoOshj0MD16QoLOI2+Q406ifpPXh4gisaOIXD4JiZXUoqwARx/Ab80zB7TJMzmK17nr4BK2eCOnocJGMMBBH9tO6FqYhveUJSwZsxBrpRDDltl6G3G7/8+K6AtLOZARu65hYwcLfL8s4l30EGCTzGwH6MA3Tew9u0Tp1HBmYOT+u+xZ62nl4AB91uGRQ+ZWAZ53HQqgMwgn3n6BC90+bl0nLJB51qH+QaphUD3EWuHVNuuhiQwlrPaS3n6zhEW+2G3I3TkSE3A5XalG860o/j/sSkcGAf62tS8MdvFfe3Oyf2tugyhBRB3qC/XuF/ADFWVOUHhFSXG4rXA78BYbiLJDUXqsMAAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII=
 // @namespace    http://tampermonkey.net/
-// @version      1.1
 // @updateURL    https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @downloadURL  https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @match        http*://*/*
@@ -381,6 +380,27 @@
     });
   };
 
+  const showToast = (tips) => {
+      // 提示保存成功
+      var successMessage = document.createElement('div');
+      successMessage.innerHTML = tips;
+      successMessage.style.position = 'fixed';
+      successMessage.style.top = '50%';
+      successMessage.style.left = '50%';
+      successMessage.style.transform = 'translate(-50%, -50%)';
+      successMessage.style.backgroundColor = '#fff';
+      successMessage.style.border = '1px solid #ddd';
+      successMessage.style.borderRadius = '10px';
+      successMessage.style.padding = '10px';
+      successMessage.style.zIndex = '10000';
+      document.body.appendChild(successMessage);
+
+      // 3 秒后移除提示信息
+      setTimeout(function () {
+        document.body.removeChild(successMessage);
+      }, 3000);
+  }
+
   // 在历史记录区域中显示用户发送的消息
   var addUserMessage = function (message) {
     const chatHistory = document.querySelector('#customization-chat-history');
@@ -426,11 +446,39 @@
     }
   };
 
+  function copyToClipboard(text) {
+    try {
+      navigator.clipboard.writeText(text);
+      showToast('复制成功');
+    } catch (error) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand("copy");
+        showToast('复制成功');
+      } catch (error) {
+        showToast('复制失败，请手动复制');
+      }
+      document.body.removeChild(textArea);
+    }
+  }
+
   // 谷歌搜索ChatGPT应答
   const generateSearchEnhance = () => {
     const messageWrapper = document.createElement('div');
     messageWrapper.className = 'chatgpt-search-enhance';
     messageWrapper.id = 'chatgpt-search-enhance';
+    // <span class="toolbar-item-EhZYV5">
+    //   <svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;">
+    //     <g><path fill="currentColor" d="M6.667 4.814 4.402 6.667H2v2.667h2.402l2.265 1.853V4.814Zm-2.741 5.853H1.333A.666.666 0 0 1 .667 10V6a.667.667 0 0 1 .666-.666h2.593l3.53-2.888A.333.333 0 0 1 8 2.704v10.593a.333.333 0 0 1-.545.258l-3.528-2.888h-.001Zm9.011 2.756-.944-.944A5.985 5.985 0 0 0 14 8a5.988 5.988 0 0 0-2.203-4.645l.947-.947A7.317 7.317 0 0 1 15.334 8a7.315 7.315 0 0 1-2.397 5.423Zm-2.362-2.362-.948-.948A2.662 2.662 0 0 0 10.667 8c0-.953-.5-1.79-1.254-2.261l.96-.96A3.995 3.995 0 0 1 12 8a3.991 3.991 0 0 1-1.425 3.061Z" data-follow-fill="#838BA7"></path></g></svg>
+    // </span>
+    // <span class="toolbar-item-EhZYV5">
+    //   <svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M12.243 12.243a6 6 0 1 1 0-8.485C12.795 4.31 14 5.666 14 5.666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M14 2.668v3h-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></g>
+    //   </svg>
+    // </span>
     messageWrapper.innerHTML = `
         <div class="header-7QHGYk">
           <div class="lt-znd2I9">
@@ -441,11 +489,8 @@
           </div>
           <div class="rt-FR4JFM">
             <div id="toolbar" class="toolbar">
-              <span class="toolbar-item-EhZYV5">
-                <svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;">
-                  <g><path fill="currentColor" d="M6.667 4.814 4.402 6.667H2v2.667h2.402l2.265 1.853V4.814Zm-2.741 5.853H1.333A.666.666 0 0 1 .667 10V6a.667.667 0 0 1 .666-.666h2.593l3.53-2.888A.333.333 0 0 1 8 2.704v10.593a.333.333 0 0 1-.545.258l-3.528-2.888h-.001Zm9.011 2.756-.944-.944A5.985 5.985 0 0 0 14 8a5.988 5.988 0 0 0-2.203-4.645l.947-.947A7.317 7.317 0 0 1 15.334 8a7.315 7.315 0 0 1-2.397 5.423Zm-2.362-2.362-.948-.948A2.662 2.662 0 0 0 10.667 8c0-.953-.5-1.79-1.254-2.261l.96-.96A3.995 3.995 0 0 1 12 8a3.991 3.991 0 0 1-1.425 3.061Z" data-follow-fill="#838BA7"></path></g></svg>
-              </span>
-              <span class="toolbar-item-EhZYV5"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M12.243 12.243a6 6 0 1 1 0-8.485C12.795 4.31 14 5.666 14 5.666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M14 2.668v3h-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg></span><span class="toolbar-item-EhZYV5"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M4.334 4.145v-1.54c0-.517.42-.937.937-.937h8.125c.518 0 .938.42.938.937v8.125c0 .518-.42.938-.938.938H11.84" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M10.729 4.332H2.604a.937.937 0 0 0-.938.938v8.125c0 .517.42.937.938.937h8.125c.517 0 .937-.42.937-.938V5.27a.937.937 0 0 0-.938-.938Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"></path></g>
+              <span title="复制" class="toolbar-item-EhZYV5">
+                <svg id="copy" width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M4.334 4.145v-1.54c0-.517.42-.937.937-.937h8.125c.518 0 .938.42.938.937v8.125c0 .518-.42.938-.938.938H11.84" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M10.729 4.332H2.604a.937.937 0 0 0-.938.938v8.125c0 .517.42.937.938.937h8.125c.517 0 .937-.42.937-.938V5.27a.937.937 0 0 0-.938-.938Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"></path></g>
                 </svg>
               </span>
             </div>
@@ -508,6 +553,9 @@
           align-items: center;
           gap: 8px;
           color: #595959;
+      }
+      .toolbar-item-EhZYV5 svg:hover {
+        cursor: pointer;
       }
       .chatgpt-search-enhance .header-7QHGYk .rt-FR4JFM .mode-GtcyE3 .mode-box-5-6c1L {
           display: flex;
@@ -603,6 +651,11 @@
     })
     document.getElementById('chatBtn').addEventListener('click', () => {
       document.getElementById('customization-drawer').style.right = 0;
+    })
+    document.getElementById('copy').addEventListener('click', () => {
+      const text = document.getElementById('answer').innerHTML;
+      console.log('text', text);
+      copyToClipboard(text);
     })
   };
 
