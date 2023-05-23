@@ -19,9 +19,9 @@
 (function () {
   'use strict';
   // 本地调试ChatGPT的iframe
-  const domain = 'http://localhost:3000/#/';
+  // const domain = 'http://localhost:3000/#/';
   // 线上ChatGPT的iframe地址
-    // const domain = 'https://chatgpt-echo.zeabur.app/';
+    const domain = 'https://chatgpt-echo.zeabur.app/';
   console.log('domain', domain);
 
   const isDomain = (platform) => {
