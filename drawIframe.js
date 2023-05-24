@@ -9,6 +9,8 @@
 // @downloadURL    https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @match          http*://*/*
 // @run-at         document-end
+// @require        https://cdn.staticfile.org/vue/2.7.0/vue.min.js
+// @require        https://unpkg.com/element-ui/lib/index.js
 // @grant          GM_log
 // @grant          GM_notification
 // @grant          unsafeWindow
@@ -27,6 +29,16 @@
 
 (function () {
   'use strict';
+
+  const $ = (selector) => {
+    return document.querySelector(selector);
+  }
+  const linkEl = document.createElement('link');
+  linkEl.rel = 'stylesheet';
+  linkEl.href =
+    'https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css';
+  
+  $("head").appendChild(linkEl);
 
   // 聊天按钮样式
   GM_addStyle(`
@@ -107,15 +119,30 @@
       }
     `)
 
-  // 本地调试ChatGPT的iframe
-  // const domain = 'http://localhost:3000/#/';
-  // 线上ChatGPT的iframe地址
-  const domain = 'https://chatgpt-echo.zeabur.app/';
-  console.log('domain', domain);
-
-  const $ = (selector) => {
-    return document.querySelector(selector);
+    //公共效果
+  GM_addStyle(`
+      #app{
+        min-width:539px;
+        right: 20px;
+        top: 100px;
+        z-index: 9999;
+      }
+    `
+  )
+  const createTabBox = () => {
+    const tabBox = document.createElement('div')
+    tabBox.id = 'app';
+    tabBox.innerHTML = `
+      <el-link type="success">成功执行：</el-link>
+    `
+    $('#customization-chat-room').appendChild(tabBox);
   }
+
+  // 本地调试ChatGPT的iframe
+  const domain = 'http://localhost:3000/#/';
+  // 线上ChatGPT的iframe地址
+  // const domain = 'https://chatgpt-echo.zeabur.app/';
+  console.log('domain', domain);
 
   const isDomain = (platform) => {
     return window.location.host.includes(platform);
@@ -332,6 +359,7 @@
     closeButton.style.textAlign = 'center';
     closeButton.style.lineHeight = '20px';
     closeButton.style.cursor = 'pointer';
+    closeButton.style.zIndex = '10000';
     closeButton.textContent = '×';
     closeButton.addEventListener('click', function () {
       drawer.style.right = '-500px';
@@ -343,8 +371,21 @@
     chatRoom.style.height = '100%';
 
     chatRoom.innerHTML = `
-        <iframe id="chatgpt-iframe" width="99%" height="99%" src="${domain}"></iframe>
-      `;
+      <el-tabs v-model="activeName"  @tab-click="handleClick">
+        <el-tab-pane label="ChatGPT" name="chatgpt">
+          <iframe id="chatgpt-iframe" width="99%" height="99%" src="${domain}"></iframe>
+        </el-tab-pane>
+        <el-tab-pane label="插件管理" name="plugins">
+          <div class="tab-item">
+            插件管理
+          </div></el-tab-pane>
+        <el-tab-pane label="跳转网页版" name="web">
+          <div class="tab-item">
+            跳转网页版
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    `;
 
     // 将聊天室添加到侧边栏抽屉中
     drawer.appendChild(closeButton);
@@ -363,8 +404,32 @@
       }
     });
 
+    // element
+    GM_addStyle(`
+      #customization-chat-room .el-tabs {
+        height: 100%;
+        background: #e7f8ff;
+        overflow: hidden;
+      }
+      .el-tabs__active-bar {
+        width: 58px!important;
+      }
+      
+      .el-tab-pane,.el-tabs__content {
+        height: 99%;
+        box-sizing: border-box;
+      }
+      .el-tabs__header {
+        margin: 0;
+        padding: 0 10px;
+      }
+    `)
+
     // 美化页面
     GM_addStyle(`
+            .tab-item {
+              margin: 10px;
+            }
             #customization-chat-room {
                 border-left: 1px solid #e5e8eb;
             }
@@ -1122,7 +1187,7 @@
       clickFn: () => {
         postMsg({
           type: 'selectText',
-          content: `将这段文字翻译成：${$('#selectVal').value}`,
+          content: `将这段文字翻译成英文：${$('#selectVal').value}`,
         })
       },
       resultId: 'selectResult',
@@ -1235,6 +1300,22 @@
 
     createDialogBox();
     handleTextAutoHeight();
+    // createTabBox();
+
+    new Vue({
+      el: '#customization-chat-room',
+      data: {
+        activeName: 'chatgpt'
+      },
+      methods: {
+        handleClick(tab, event) {
+          console.log(tab, event);
+          if(tab.name === 'web') {
+            window.open(domain, '_blank');
+          }
+        }
+      }
+    })
 
 
     const iframe = $('#chatgpt-iframe');
