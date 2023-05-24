@@ -861,6 +861,19 @@
     return formatResult;
   };
 
+  // 计算输入框大小
+  // input：(必填)输入框
+  // rowh：(必填)当没有内容时默认高度，如果不传当没有内容时会没高度
+  // colw：(可选)当没有内容时默认宽度，如果不传宽度会很窄
+  function inputSizeChange (textarea) {
+    let text = textarea.value;
+    let lines = text.split("\n");
+    let lineHeight = 32;
+    let height = lines.length * lineHeight;
+    console.log('inputSizeChange', lineHeight, lines.length, lines)
+    textarea.style.height = height + "px";
+  }
+
   // 处理监听ChatGPT-web的消息
   const handlePostMessage = () => {
     // 父级，在frame处抛出接收事件
@@ -885,9 +898,11 @@
             $('#footer').style.display = 'flex';
             $('#toolbar').style.display = 'inline-flex';
           }
-          if(event.data.type === 'explain') {
+          if(event.data.type === 'selectText') {
             console.log('re', event.data.data.content)
             $('#selectResult').value = event.data.data.content;
+            $('#selectResult').addec
+            inputSizeChange($('#selectResult'))
           }
         }
       },
@@ -906,6 +921,14 @@
       (rect.left + rect.right) / 2 + window.pageXOffset + 'px';
   }
 
+  function addClickAndPostMsg({targetId, type, content, resultId, clickFn}) {
+    $(`#${targetId}`).addEventListener('click', () => {
+      postMsg({type, content});
+      $(`#${resultId}`).value = '加载中...'
+      clickFn && clickFn();
+    })
+  }
+
   function createDialogBox() {
     dialogBox = document.createElement('div');
     dialogBox.id = 'floatDialog';
@@ -916,8 +939,29 @@
     dialogBox.style.display = "none";
     dialogBox.style.borderRadius = "8px";
     dialogBox.style.border = "1px solid #dadce0";
+    const briefContent = document.createElement('div');
+    briefContent.id = 'briefContent';
+    briefContent.style.alignItems = 'center';
+    briefContent.innerHTML = `
+      <div class="brief-title lt-znd2I9">
+        <a class="title" href="${domain}" target="_blank" rel="noreferrer">
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" fill="none" class="user-avatar"><defs><path id="bot_svg__a" d="M0 0h30v30H0z"></path><path id="bot_svg__c" d="M0 0h20.455v20.455H0z"></path></defs><g><rect fill="#E7F8FF" width="30" height="30" rx="10"></rect><mask id="bot_svg__b" fill="#fff"><use xlink:href="#bot_svg__a"></use></mask><g mask="url(#bot_svg__b)"><g transform="translate(4.773 4.773)"><mask id="bot_svg__d" fill="#fff"><use xlink:href="#bot_svg__c"></use></mask><g mask="url(#bot_svg__d)"><path fill-rule="evenodd" d="M19.11 8.37c.17-.52.26-1.06.26-1.61 0-.9-.24-1.79-.71-2.57a5.24 5.24 0 0 0-4.53-2.59c-.37 0-.73.04-1.09.11A5.201 5.201 0 0 0 9.17 0h-.04C6.86 0 4.86 1.44 4.16 3.57A5.11 5.11 0 0 0 .71 6.04C.24 6.83 0 7.72 0 8.63c0 1.27.48 2.51 1.35 3.45-.18.52-.27 1.07-.27 1.61 0 .91.25 1.8.71 2.58 1.13 1.94 3.41 2.94 5.63 2.47a5.18 5.18 0 0 0 3.86 1.71h.05c2.26 0 4.27-1.44 4.97-3.57a5.132 5.132 0 0 0 3.45-2.47c.46-.78.7-1.67.7-2.58 0-1.28-.48-2.51-1.34-3.46ZM8.947 18.158c-.04.03-.08.05-.12.07.7.58 1.57.89 2.48.89h.01c2.14 0 3.88-1.72 3.88-3.83v-4.76c0-.02-.02-.04-.04-.05l-1.74-.99v5.75c0 .23-.13.45-.34.57l-4.13 2.35Zm-.67-1.153 4.17-2.38c.02-.01.03-.03.03-.05v-1.99l-5.04 2.87c-.21.12-.47.12-.68 0l-4.13-2.35c-.04-.02-.09-.06-.12-.07-.04.21-.06.43-.06.65 0 .67.18 1.33.52 1.92v-.01c.7 1.19 1.98 1.92 3.37 1.92.68 0 1.35-.18 1.94-.51ZM3.903 5.168v-.14c-.85.31-1.57.9-2.02 1.68a3.78 3.78 0 0 0-.52 1.91c0 1.37.74 2.64 1.94 3.33l4.17 2.37c.02.01.04.01.06 0l1.75-1-5.04-2.87a.64.64 0 0 1-.34-.57v-4.71Zm13.253 3.337-4.18-2.38c-.02 0-.04 0-.06.01l-1.74.99 5.04 2.87c.21.12.34.34.34.58v4.85c1.52-.56 2.54-1.99 2.54-3.6 0-1.37-.74-2.63-1.94-3.32ZM8.014 5.83c-.02.01-.03.03-.03.05v1.99L13.024 5a.692.692 0 0 1 .68 0l4.13 2.35c.04.02.08.05.12.07.03-.21.05-.43.05-.65 0-2.11-1.74-3.83-3.88-3.83-.68 0-1.35.18-1.94.51l-4.17 2.38Zm1.133-4.492c-2.15 0-3.89 1.72-3.89 3.83v4.76c0 .02.02.03.03.04l1.75 1v-5.75c0-.23.13-.45.34-.57l4.13-2.35c.04-.03.09-.06.12-.07-.7-.58-1.58-.89-2.48-.89ZM7.983 11.51l2.24 1.27 2.25-1.27V8.95l-2.25-1.28-2.24 1.28v2.56Z" style="fill: rgb(31, 148, 140);"></path></g></g></g></g></svg>
+        </a>
+      </div>
+      <div class="action-bar-lite-window-vuGdUx action-bar-SA76od" style="opacity: 1;">
+        <div class="box-NzPGeV">
+          <span id="explain" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
+            <span class="text-wrapper-92ojRl" data-text="解释">
+              <span class="text-0Pw8ng">解释</span>
+            </span>
+          </span>
+      </div>
+    `
+    dialogBox.appendChild(briefContent);
+    const complateContent = document.createElement('div');
+    complateContent.id = 'complateContent';
 
-    dialogBox.innerHTML = `
+    complateContent.innerHTML = `
       <div id="dialogBoxSelectBox">
         <h5 id="dialogBoxSelectTitle">选中文本<h5/>
         <textarea class="text-area" id="selectVal"></textarea>
@@ -925,22 +969,22 @@
       <div id="selectActions">
         <div class="action-bar-lite-window-vuGdUx action-bar-SA76od" style="opacity: 1;">
           <div class="box-NzPGeV">
-            <div data-id="751061" class="tag-button" style="opacity: 1; pointer-events: auto;">
+            <div id="summary" data-id="751061" class="tag-button" style="opacity: 1; pointer-events: auto;">
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M10.5 10.5h6M10.5 13.5h6M19.5 3.75h-15a.75.75 0 0 0-.75.75v15c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75v-15a.75.75 0 0 0-.75-.75ZM7.5 3.75v16.5" data-follow-stroke="#000"></path></g></svg>
-              <div class="text-wrapper-92ojRl" data-text="摘要"><div class="text-0Pw8ng">摘要</div></div></div>
-            <span data-id="1924664" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 32 32" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="m27 26-5-10-5 10M18.428 23.143h7.143M5 18h9M5 23h9M5.006 8h21M5.006 13h21" data-follow-stroke="#000"></path></g></svg>
+              <div class="text-wrapper-92ojRl" data-text="总结"><div class="text-0Pw8ng">摘要</div></div></div>
+            <span id="grammar" data-id="1924664" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 32 32" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="m27 26-5-10-5 10M18.428 23.143h7.143M5 18h9M5 23h9M5.006 8h21M5.006 13h21" data-follow-stroke="#000"></path></g></svg>
               <span class="text-wrapper-92ojRl" data-text="语法"><span class="text-0Pw8ng">语法</span></span></span>
-            <span data-id="1924663" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path fill="currentColor" d="M7.8 19.2H7A1.2 1.2 0 0 1 5.8 18v-4.1a1.8 1.8 0 0 0-1.236-1.71L3.987 12l.577-.19A1.8 1.8 0 0 0 5.8 10.1V6A1.2 1.2 0 0 1 7 4.8h.8V3.2H7A2.8 2.8 0 0 0 4.2 6v3.7a1.7 1.7 0 0 1-1.7 1.7h-.3v1.2h.3a1.7 1.7 0 0 1 1.7 1.7V18A2.8 2.8 0 0 0 7 20.8h.8v-1.6ZM16.2 19.2h.8a1.2 1.2 0 0 0 1.2-1.2v-4.1a1.8 1.8 0 0 1 1.236-1.71l.577-.19-.577-.19A1.8 1.8 0 0 1 18.2 10.1V6A1.2 1.2 0 0 0 17 4.8h-.8V3.2h.8A2.8 2.8 0 0 1 19.8 6v3.7a1.701 1.701 0 0 0 1.7 1.7h.3v1.2h-.3a1.7 1.7 0 0 0-1.7 1.7V18a2.8 2.8 0 0 1-2.8 2.8h-.8v-1.6Z" clip-rule="evenodd" fill-rule="evenodd" data-follow-fill="#09121F"></path></g></svg>
+            <span id="explainCode" data-id="1924663" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path fill="currentColor" d="M7.8 19.2H7A1.2 1.2 0 0 1 5.8 18v-4.1a1.8 1.8 0 0 0-1.236-1.71L3.987 12l.577-.19A1.8 1.8 0 0 0 5.8 10.1V6A1.2 1.2 0 0 1 7 4.8h.8V3.2H7A2.8 2.8 0 0 0 4.2 6v3.7a1.7 1.7 0 0 1-1.7 1.7h-.3v1.2h.3a1.7 1.7 0 0 1 1.7 1.7V18A2.8 2.8 0 0 0 7 20.8h.8v-1.6ZM16.2 19.2h.8a1.2 1.2 0 0 0 1.2-1.2v-4.1a1.8 1.8 0 0 1 1.236-1.71l.577-.19-.577-.19A1.8 1.8 0 0 1 18.2 10.1V6A1.2 1.2 0 0 0 17 4.8h-.8V3.2h.8A2.8 2.8 0 0 1 19.8 6v3.7a1.701 1.701 0 0 0 1.7 1.7h.3v1.2h-.3a1.7 1.7 0 0 0-1.7 1.7V18a2.8 2.8 0 0 1-2.8 2.8h-.8v-1.6Z" clip-rule="evenodd" fill-rule="evenodd" data-follow-fill="#09121F"></path></g></svg>
               <span class="text-wrapper-92ojRl" data-text="解释代码"><span class="text-0Pw8ng">解释代码</span></span></span>
-            <span data-id="1924662" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M12.75 6 18 11.25M20.25 20.25H9l-5.202-5.202" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M9 20.25H4.5a.75.75 0 0 1-.75-.75v-4.19a.75.75 0 0 1 .22-.53L15.22 3.53a.75.75 0 0 1 1.06 0l4.19 4.19a.75.75 0 0 1 0 1.06L9 20.25Z" data-follow-stroke="#000"></path></g></svg>
+            <span id="rewrite" data-id="1924662" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M12.75 6 18 11.25M20.25 20.25H9l-5.202-5.202" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M9 20.25H4.5a.75.75 0 0 1-.75-.75v-4.19a.75.75 0 0 1 .22-.53L15.22 3.53a.75.75 0 0 1 1.06 0l4.19 4.19a.75.75 0 0 1 0 1.06L9 20.25Z" data-follow-stroke="#000"></path></g></svg>
               <span class="text-wrapper-92ojRl" data-text="重写"><span class="text-0Pw8ng">重写</span></span></span>
             <span id="explain" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
               <span class="text-wrapper-92ojRl" data-text="解释"><span class="text-0Pw8ng">解释</span></span></span>
-            <span data-id="751060" class="tag-button" style="opacity: 1; pointer-events: none;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M21.75 20.25 16.5 9.75l-5.25 10.5M12.75 17.25h7.5M8.25 3v2.25M2.25 5.25h12M11.25 5.25a9 9 0 0 1-9 9" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M5.763 8.25a9.004 9.004 0 0 0 8.486 5.997" data-follow-stroke="#000"></path></g></svg>
+            <span id="translate" data-id="751060" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M21.75 20.25 16.5 9.75l-5.25 10.5M12.75 17.25h7.5M8.25 3v2.25M2.25 5.25h12M11.25 5.25a9 9 0 0 1-9 9" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M5.763 8.25a9.004 9.004 0 0 0 8.486 5.997" data-follow-stroke="#000"></path></g></svg>
               <span class="text-wrapper-92ojRl" data-text="翻译"><span class="text-0Pw8ng">翻译</span></span></span>
-            <span data-id="1924661" class="tag-button" style="opacity: 1; pointer-events: none;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M20.95 11.625a8.625 8.625 0 0 1-8.625 8.625H3.7v-8.625a8.625 8.625 0 0 1 17.25 0Z" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M12.325 13.62v-1.725a2.587 2.587 0 1 0-2.588-2.588" data-follow-stroke="#000"></path><path fill="currentColor" d="M12.325 17.501a1.078 1.078 0 1 0 0-2.156 1.078 1.078 0 0 0 0 2.156Z" clip-rule="evenodd" fill-rule="evenodd" data-follow-fill="#000"></path></g></svg>
+            <span id="qa" data-id="1924661" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M20.95 11.625a8.625 8.625 0 0 1-8.625 8.625H3.7v-8.625a8.625 8.625 0 0 1 17.25 0Z" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M12.325 13.62v-1.725a2.587 2.587 0 1 0-2.588-2.588" data-follow-stroke="#000"></path><path fill="currentColor" d="M12.325 17.501a1.078 1.078 0 1 0 0-2.156 1.078 1.078 0 0 0 0 2.156Z" clip-rule="evenodd" fill-rule="evenodd" data-follow-fill="#000"></path></g></svg>
               <span class="text-wrapper-92ojRl" data-text="问答"><span class="text-0Pw8ng">问答</span></span></span>
-            <span data-id="1924660" class="tag-button" style="opacity: 1; pointer-events: none;"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="#637381" d="M10 3h3v3m-3.5.5L13 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="#37404A" d="M6 13H3v-3m3.5-.5L3 13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>
+            <span id="expansion" data-id="1924660" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="#637381" d="M10 3h3v3m-3.5.5L13 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="#37404A" d="M6 13H3v-3m3.5-.5L3 13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>
               <span class="text-wrapper-92ojRl" data-text="扩写"><span class="text-0Pw8ng">扩写</span></span></span></div>
         </div>
       </div>
@@ -950,8 +994,14 @@
       <div>
     `;
     GM_addStyle(`
+      .brief-title {
+        margin-right: 10px;
+      }
       .text-area {
         width: 99%;
+      }
+      #selectActions {
+        margin-top: 10px;
       }
       .action-bar-SA76od.action-bar-lite-window-vuGdUx .box-NzPGeV {
           justify-content: left;
@@ -1010,14 +1060,92 @@
           text-decoration: none!important;
       }
     `);
+    dialogBox.appendChild(complateContent);
     document.body.appendChild(dialogBox);
-    creatChatBtn(dialogBox);
-    $('#explain').addEventListener('click', () => {
-      postMsg({
-        type: 'explain',
-        content: `解释${$('#selectVal').value}, 并说明其中使用的任何技术术语。`,
-      });
-      $('#selectResult').value = '加载中...';
+    creatChatBtn(complateContent);
+    $('#briefContent').addEventListener('click', () => {
+      $('#briefContent').style.display = 'none';
+      complateContent.style.display= 'block';
+    })
+    addClickAndPostMsg({
+      targetId: 'summary',
+      clickFn: () => {
+        postMsg({
+            type: 'selectText',
+            content: `用原文语言概括这段文字：${$('#selectVal').value}`,
+        })
+      },
+      resultId: 'selectResult',
+    });
+    addClickAndPostMsg({
+      targetId: 'grammar',
+      clickFn: () => {
+        postMsg({
+          type: 'selectText',
+          content: `校对并纠正这段文字：${$('#selectVal').value}`,
+        })
+      },
+      resultId: 'selectResult',
+    });
+    addClickAndPostMsg({
+      targetId: 'explainCode', 
+      clickFn: () => {
+        postMsg({
+          type: 'selectText',
+          content: '解释以下代码：```'+ $('#selectVal').value + '```',
+        })
+      },
+      resultId: 'selectResult',
+    })
+    addClickAndPostMsg({
+      targetId: 'rewrite', 
+      clickFn: () => {
+        postMsg({
+          type: 'selectText',
+          content: `重新表述这段文字：${$('#selectVal').value}`,
+        })
+      },
+      resultId: 'selectResult',
+    })
+    addClickAndPostMsg({
+      targetId: 'explain', 
+      clickFn: () => {
+        postMsg({
+          type: 'selectText',
+          content: `解释${$('#selectVal').value}, 并说明其中使用的任何技术术语。`,
+        })
+      },
+      resultId: 'selectResult',
+    })
+    addClickAndPostMsg({
+      targetId: 'translate',
+      clickFn: () => {
+        postMsg({
+          type: 'selectText',
+          content: `将这段文字翻译成：${$('#selectVal').value}`,
+        })
+      },
+      resultId: 'selectResult',
+    });
+    addClickAndPostMsg({
+      targetId: 'qa',
+      clickFn: () => {
+        postMsg({
+          type: 'selectText',
+          content: `回答这个问题：${$('#selectVal').value}`,
+        })
+      },
+      resultId: 'selectResult',
+    });
+    addClickAndPostMsg({
+      targetId: 'expansion',
+      clickFn: () => {
+        postMsg({
+          type: 'selectText',
+          content: `详细说明这段文字：${$('#selectVal').value}`,
+        })
+      },
+      resultId: 'selectResult',
     });
 
     return dialogBox;
@@ -1049,9 +1177,11 @@
         console.log('选中了文本：', selectionText, $('#floatDialog'));
         $('#selectVal').value = selectionText;
         dialogBox.style.display = "block";
+        $('#briefContent').style.display = 'flex';
+        $('#complateContent').style.display = 'none';
         setDialogBoxPos()
 
-        postMsg({ type: 'selectText', content: selectionText });
+        // postMsg({ type: 'selectText', content: selectionText });
       } else {
         let selectedElement = document.getSelection()?.focusNode?.parentNode;
         !isInDialogBox() && (dialogBox.style.display = "none");
