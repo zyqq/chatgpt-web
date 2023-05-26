@@ -373,12 +373,28 @@
     chatRoom.innerHTML = `
       <el-tabs v-model="activeName"  @tab-click="handleClick">
         <el-tab-pane label="ChatGPT" name="chatgpt">
-          <iframe id="chatgpt-iframe" width="99%" height="99%" src="${domain}"></iframe>
+          <div id="chatgpt-box" class="tab-item">
+            <iframe id="chatgpt-iframe" src="${domain}"></iframe>
+          </div>
         </el-tab-pane>
         <el-tab-pane label="插件管理" name="plugins">
           <div class="tab-item">
-            插件管理
-          </div></el-tab-pane>
+            <el-collapse>
+              <el-collapse-item :key="item.key" v-for="item in localCode">
+                <template slot="title">
+                  <el-checkbox v-model="item.isChecked">
+                    <el-button size="mini" @click="evalCode(item.content)">{{item.name}}</el-button>
+                  </el-checkbox>
+                </template>
+                <el-input 
+                  type="textarea"
+                  autosize
+                  v-model="item.content"
+                ></el-input>
+              </el-collapse-item>
+            </el-collapse>
+          </div>
+        </el-tab-pane>
         <el-tab-pane label="跳转网页版" name="web">
           <div class="tab-item">
             跳转网页版
@@ -387,6 +403,16 @@
       </el-tabs>
     `;
 
+            // <div :key="item.key" v-for="item in localCode">
+            //   <el-checkbox v-model="item.isChecked">
+            //     <el-button size="mini" @click="evalCode(item.content)">{{item.name}}</el-button>
+            //   </el-checkbox>
+            //   <el-input 
+            //     type="textarea"
+            //     autosize
+            //     v-model="item.content"
+            //   ></el-input>
+            // </div>
     // 将聊天室添加到侧边栏抽屉中
     drawer.appendChild(closeButton);
     drawer.appendChild(chatRoom);
@@ -415,12 +441,27 @@
         width: 58px!important;
       }
       
-      .el-tab-pane,.el-tabs__content {
+      .el-tabs__content {
+        height: 99%;
+        box-sizing: border-box;
+      }
+      
+      .el-tab-pane {
         height: 99%;
         box-sizing: border-box;
       }
       .el-tabs__header {
         margin: 0;
+        padding: 0 10px;
+      }
+      #chatgpt-iframe {
+        width: 99%;
+        height: 99%;
+      }
+      .el-collapse-item__header {
+        padding: 0 10px;
+      }
+      .el-collapse-item__wrap {
         padding: 0 10px;
       }
     `)
@@ -429,6 +470,7 @@
     GM_addStyle(`
             .tab-item {
               margin: 10px;
+              height: 100%;
             }
             #customization-chat-room {
                 border-left: 1px solid #e5e8eb;
@@ -538,6 +580,11 @@
       }, 3000);
     });
   };
+
+  const evalCode = (content) => {
+    const myFunc = new Function(content);
+    myFunc();
+  }
 
   const showToast = (tips) => {
     // 提示保存成功
@@ -948,9 +995,13 @@
         // console.log('msg', event.data, event);
         if (event.data.origin && event.data.origin === 'chatgpt-web') {
           console.log('chatgpt-web', event.data, event);
+          const { content, key } = event.data.data
           if (event.data.type === 'code') {
-            const myFunc = new Function(event.data.data.content);
-            myFunc();
+            evalCode(content);
+            const chatgptKey = `chatgpt-${key}`
+            if(!localStorage.getItem(chatgptKey)){
+              localStorage.setItem(chatgptKey, content);
+            }
           }
           if (event.data.type === 'read') {
             console.log('阅读文章');
@@ -1305,7 +1356,26 @@
     new Vue({
       el: '#customization-chat-room',
       data: {
-        activeName: 'chatgpt'
+        activeName: 'chatgpt',
+        localCode: []
+      },
+      watch() {
+        // localCode() {
+
+        // }
+      },
+      mounted() {
+        console.log('==mounted')
+        for(let key in localStorage){
+          if(key.split('-')[0] === 'chatgpt'){
+            const content = localStorage.getItem(key);
+            const match = content.match(/@name\s+([\w\s]+)\n/);
+            const name = match ? match[1].trim() : "未命名脚本";
+            console.log(name); // 输出 "滚动到顶部按钮"
+            this.localCode.push({key, content, name, isChecked: true})
+            console.log('===localCode', key, this.localCode);
+          }
+        }
       },
       methods: {
         handleClick(tab, event) {
@@ -1313,6 +1383,11 @@
           if(tab.name === 'web') {
             window.open(domain, '_blank');
           }
+        },
+
+        evalCode(content) {
+          const myFunc = new Function(content);
+          myFunc();
         }
       }
     })
