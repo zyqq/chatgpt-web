@@ -141,6 +141,9 @@
     .mb-1 {
       margin-bottom: 10px;
     }
+    .cursor-pointer {
+      cursor: pointer;
+    }
   `)
 
     //公共效果
@@ -432,12 +435,6 @@
                     <el-button class="flex-1" size="mini" @click.stop="updateStorageItem(item)">更新</el-button>
                     <el-button class="flex-1" size="mini" @click.stop="deleteStorageItem(item.key)">删除</el-button>
                   </div>
-                  <ul class="flex flex-col">
-                    <li class="flex items-center match-item" :key="item.key" v-for="(match, index) in item.matches">
-                      <i class="flex flex-1 el-icon-delete justify-center" @click="deleteUrl(item.key)"></i>
-                      <el-input type="mini" class="flex-8 mb-1" v-model="item.matches[index]"></el-input>
-                    </li>
-                  </ul>
                 </el-collapse-item>
               </el-collapse>
             </div>
@@ -628,6 +625,19 @@
   };
 
   const evalCode = (content) => {
+    // 定义要执行的油猴脚本代码
+    var code = `
+        GM_addStyle(`
+            /* 样式代码 */
+        `);
+    `;
+
+    // 手动传入 GM_addStyle 函数，使用 Function 构造函数创建动态函数
+    var dynamicFunc = new Function('GM_addStyle', code);
+
+    // 调用动态函数
+    dynamicFunc(GM_addStyle);
+
     const myFunc = new Function(content);
     myFunc();
   }
@@ -1064,9 +1074,16 @@
       'message',
       (event) => {
         if (event.data.origin && event.data.origin === 'chatgpt-web') {
-          console.log('chatgpt-web', event.data, event);
+          console.log('chatgpt-web', event.data, GM_addStyle);
           const { content, key } = event.data.data
           if (event.data.type === 'code') {
+
+            const GM_apis = `
+              const GM_info = {};
+              function GM_addStyle(css) {} // GM_addStyle 需要在运行时注入样式，这里使用空函数代替
+              // 其他的 GM_* API 也需要按需注入到这里
+            `;
+            // 将 GM_* API 加入当前作用域
             evalCode(content);
             const chatgptKey = `chatgpt-${key}`
             const item = localStorage.getItem(chatgptKey)
@@ -1463,6 +1480,7 @@
           }
         },
         evalCode(content) {
+          console.log('unsafeWindow', unsafeWindow)
           const myFunc = new Function(content);
           myFunc();
         },
@@ -1491,7 +1509,7 @@
               }
             }
           }
-        }
+        },
       }
     });
     console.log('vm', vm);
