@@ -119,6 +119,25 @@
       }
     `)
 
+  // 公用样式类
+  GM_addStyle(`
+    .flex {
+      display: flex;
+    }
+    .flex-1 {
+      flex: 1;
+    }
+    .items-center {
+      align-items: center;
+    }
+    .justify-center {
+      justify-content: center;
+    }
+    .mb-1 {
+      margin-bottom: 10px;
+    }
+  `)
+
     //公共效果
   GM_addStyle(`
       #app{
@@ -129,6 +148,8 @@
       }
     `
   )
+
+  let vm = null;
   const createTabBox = () => {
     const tabBox = document.createElement('div')
     tabBox.id = 'app';
@@ -379,18 +400,29 @@
         </el-tab-pane>
         <el-tab-pane label="插件管理" name="plugins">
           <div class="tab-item">
+            <el-alert
+              class="mb-1"
+              title="勾选即下次进入网页自动生效，单击按钮即单次执行生效"
+              type="success"
+              show-icon>
+            </el-alert>
             <el-collapse>
               <el-collapse-item :key="item.key" v-for="item in localCode">
                 <template slot="title">
-                  <el-checkbox v-model="item.isChecked">
-                    <el-button size="mini" @click="evalCode(item.content)">{{item.name}}</el-button>
+                  <el-checkbox @change="(isChecked) => handleCheckboxChange(isChecked, item)" v-model="item.isChecked">
+                    <el-button size="mini" @click.stop="evalCode(item.content)">{{item.name}}</el-button>
                   </el-checkbox>
                 </template>
                 <el-input 
+                  class="mb-1"
                   type="textarea"
                   autosize
                   v-model="item.content"
                 ></el-input>
+                <div class="flex justify-center">
+                  <el-button class="flex-1" size="mini" @click.stop="updateStorageItem(item)">更新</el-button>
+                  <el-button class="flex-1" size="mini" @click.stop="deleteStorageItem(item.key)">删除</el-button>
+                </div>
               </el-collapse-item>
             </el-collapse>
           </div>
@@ -986,6 +1018,14 @@
     textarea.style.height = height + "px";
   }
 
+  // 获取油猴脚本信息
+  const getCodeInfo = (content) => {
+    const match = content.match(/@name\s+([\w\s]+)\n/);
+    const name = match ? match[1].trim() : "未命名脚本";
+    console.log(name); // 输出 "滚动到顶部按钮"
+    return {name};
+  }
+
   // 处理监听ChatGPT-web的消息
   const handlePostMessage = () => {
     // 父级，在frame处抛出接收事件
@@ -999,9 +1039,20 @@
           if (event.data.type === 'code') {
             evalCode(content);
             const chatgptKey = `chatgpt-${key}`
-            if(!localStorage.getItem(chatgptKey)){
-              localStorage.setItem(chatgptKey, content);
-            }
+            const item = localStorage.getItem(chatgptKey)
+            console.log('chatgpt-web', item)
+            const {name} = getCodeInfo(content);
+            const storageItem = 
+              {
+                content,
+                key: chatgptKey,
+                isChecked: true,
+                name,
+              };
+            localStorage.setItem(
+              chatgptKey, JSON.stringify(storageItem));
+              console.log('chatgpt-web222', vm);
+            vm.$options.methods.updateStorageItem(storageItem)
           }
           if (event.data.type === 'read') {
             console.log('阅读文章');
@@ -1353,7 +1404,7 @@
     handleTextAutoHeight();
     // createTabBox();
 
-    new Vue({
+    vm = new Vue({
       el: '#customization-chat-room',
       data: {
         activeName: 'chatgpt',
@@ -1366,16 +1417,11 @@
       },
       mounted() {
         console.log('==mounted')
-        for(let key in localStorage){
-          if(key.split('-')[0] === 'chatgpt'){
-            const content = localStorage.getItem(key);
-            const match = content.match(/@name\s+([\w\s]+)\n/);
-            const name = match ? match[1].trim() : "未命名脚本";
-            console.log(name); // 输出 "滚动到顶部按钮"
-            this.localCode.push({key, content, name, isChecked: true})
-            console.log('===localCode', key, this.localCode);
-          }
-        }
+        window.addEventListener("storage", this.handleStorageChange);
+        this.handleStorageChange()
+      },
+      beforeUnmount() {
+        window.removeEventListener("storage", this.handleStorageChange)
       },
       methods: {
         handleClick(tab, event) {
@@ -1384,14 +1430,40 @@
             window.open(domain, '_blank');
           }
         },
-
         evalCode(content) {
           const myFunc = new Function(content);
           myFunc();
+        },
+        handleCheckboxChange(isChecked, item) {
+          console.log('handleCheckboxChange', isChecked, item);
+          item.isChecked = isChecked;
+          this.updateStorageItem(item);
+        },
+        deleteStorageItem(key) {
+          this.localCode = this.localCode.filter(item => item.key !== key);
+          localStorage.removeItem(key);
+        },
+        updateStorageItem(item) {
+          console.log('updateStorageItem', item)
+          localStorage.setItem(item.key, JSON.stringify(item));
+          this.handleStorageChange()
+        },
+        handleStorageChange() {
+          for(let key in localStorage){
+            if(key.split('-')[0] === 'chatgpt'){
+              const storageItem = JSON.parse(localStorage.getItem(key))
+              const storage = this.localCode.filter(item => item.key !== storageItem.key)
+              storage.length === 0 && this.localCode.push(storageItem);
+              if(storageItem.isChecked) {
+                evalCode(storageItem.content);
+              }
+              console.log('===localCode', key, this.localCode);
+            }
+          }
         }
       }
-    })
-
+    });
+    console.log('vm', vm);
 
     const iframe = $('#chatgpt-iframe');
 
