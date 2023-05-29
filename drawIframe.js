@@ -398,35 +398,42 @@
             <iframe id="chatgpt-iframe" src="${domain}"></iframe>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="插件管理" name="plugins">
-          <div class="tab-item">
-            <el-alert
-              class="mb-1"
-              title="勾选即下次进入网页自动生效，单击按钮即单次执行生效"
-              type="success"
-              show-icon>
-            </el-alert>
-            <el-collapse>
-              <el-collapse-item :key="item.key" v-for="item in localCode">
+        <el-tab-pane name="plugins">
+            <el-badge label="插件管理"  slot="label" :is-dot="isGetNew" class="tab-item-badge">
+                插件管理
+            </el-badge>
+
+            <div v-if="localCode.length > 0" class="tab-item">
+              <el-alert
+                class="mb-1"
+                title="勾选即下次进入网页自动生效，单击按钮即单次执行生效"
+                type="success"
+                show-icon>
+              </el-alert>
+              <el-collapse>
+                <el-collapse-item :key="item.key" v-for="item in localCode">
                 <template slot="title">
-                  <el-checkbox @change="(isChecked) => handleCheckboxChange(isChecked, item)" v-model="item.isChecked">
-                    <el-button size="mini" @click.stop="evalCode(item.content)">{{item.name}}</el-button>
-                  </el-checkbox>
-                </template>
-                <el-input 
-                  class="mb-1"
-                  type="textarea"
-                  autosize
-                  v-model="item.content"
-                ></el-input>
-                <div class="flex justify-center">
-                  <el-button class="flex-1" size="mini" @click.stop="updateStorageItem(item)">更新</el-button>
-                  <el-button class="flex-1" size="mini" @click.stop="deleteStorageItem(item.key)">删除</el-button>
-                </div>
-              </el-collapse-item>
-            </el-collapse>
-          </div>
-        </el-tab-pane>
+                    <el-checkbox @change="(isChecked) => handleCheckboxChange(isChecked, item)" v-model="item.isChecked">
+                      <el-button size="mini" @click.stop="evalCode(item.content)">{{item.name}}</el-button>
+                    </el-checkbox>
+                  </template>
+                  <el-input 
+                    class="mb-1"
+                    type="textarea"
+                    autosize
+                    v-model="item.content"
+                  ></el-input>
+                  <div class="flex justify-center">
+                    <el-button class="flex-1" size="mini" @click.stop="updateStorageItem(item)">更新</el-button>
+                    <el-button class="flex-1" size="mini" @click.stop="deleteStorageItem(item.key)">删除</el-button>
+                  </div>
+                </el-collapse-item>
+              </el-collapse>
+            </div>
+            <div v-else class="tab-item">
+              暂无插件，请在聊天中生成油猴脚本点击运行代码即可生成。
+            </div>
+          </el-tab-pane>
         <el-tab-pane label="跳转网页版" name="web">
           <div class="tab-item">
             跳转网页版
@@ -495,6 +502,9 @@
       }
       .el-collapse-item__wrap {
         padding: 0 10px;
+      }
+      .tab-item-badge .el-badge__content.is-fixed {
+        top: 5px;
       }
     `)
 
@@ -1051,8 +1061,9 @@
               };
             localStorage.setItem(
               chatgptKey, JSON.stringify(storageItem));
-              console.log('chatgpt-web222', vm);
-            vm.$options.methods.updateStorageItem(storageItem)
+            vm.updateStorageItem(storageItem)
+            vm.isGetNew = true;
+            console.log('isGetNew', vm.isGetNew, vm);
           }
           if (event.data.type === 'read') {
             console.log('阅读文章');
@@ -1408,12 +1419,8 @@
       el: '#customization-chat-room',
       data: {
         activeName: 'chatgpt',
-        localCode: []
-      },
-      watch() {
-        // localCode() {
-
-        // }
+        localCode: [],
+        isGetNew: false,
       },
       mounted() {
         console.log('==mounted')
@@ -1425,9 +1432,11 @@
       },
       methods: {
         handleClick(tab, event) {
-          console.log(tab, event);
+          console.log('handleTab', tab, event);
           if(tab.name === 'web') {
             window.open(domain, '_blank');
+          } else if(tab.name === 'plugins') {
+            this.isGetNew = false;
           }
         },
         evalCode(content) {
@@ -1449,15 +1458,15 @@
           this.handleStorageChange()
         },
         handleStorageChange() {
+          this.localCode = [];
           for(let key in localStorage){
             if(key.split('-')[0] === 'chatgpt'){
               const storageItem = JSON.parse(localStorage.getItem(key))
-              const storage = this.localCode.filter(item => item.key !== storageItem.key)
-              storage.length === 0 && this.localCode.push(storageItem);
+              this.localCode.push(storageItem);
               if(storageItem.isChecked) {
                 evalCode(storageItem.content);
               }
-              console.log('===localCode', key, this.localCode);
+              console.log('===localCode', localStorage, this.localCode);
             }
           }
         }
