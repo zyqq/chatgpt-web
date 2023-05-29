@@ -1030,7 +1030,8 @@
 
   // 获取油猴脚本信息
   const getCodeInfo = (content) => {
-    const match = content.match(/@name\s+([\w\s]+)\n/);
+    const match = content.match(/@name\s*([^\n;]+)/);
+    // const match = content.match(/@name\s+([\w\s]+)\n/);
     const name = match ? match[1].trim() : "未命名脚本";
     console.log(name); // 输出 "滚动到顶部按钮"
     return {name};
