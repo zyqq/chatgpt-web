@@ -474,7 +474,6 @@
       #customization-chat-room .el-tabs {
         height: 100%;
         background: #e7f8ff;
-        overflow: hidden;
       }
       .el-tabs__active-bar {
         width: 58px!important;
@@ -1031,9 +1030,7 @@
   // 获取油猴脚本信息
   const getCodeInfo = (content) => {
     const match = content.match(/@name\s*([^\n;]+)/);
-    // const match = content.match(/@name\s+([\w\s]+)\n/);
     const name = match ? match[1].trim() : "未命名脚本";
-    console.log(name); // 输出 "滚动到顶部按钮"
     return {name};
   }
 
@@ -1043,7 +1040,6 @@
     window.addEventListener(
       'message',
       (event) => {
-        // console.log('msg', event.data, event);
         if (event.data.origin && event.data.origin === 'chatgpt-web') {
           console.log('chatgpt-web', event.data, event);
           const { content, key } = event.data.data
@@ -1467,7 +1463,6 @@
               if(storageItem.isChecked) {
                 evalCode(storageItem.content);
               }
-              console.log('===localCode', localStorage, this.localCode);
             }
           }
         }
