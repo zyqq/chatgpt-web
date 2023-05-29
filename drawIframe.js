@@ -8,6 +8,7 @@
 // @updateURL      https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @downloadURL    https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @match          http*://*/*
+// @run-at         document-end
 // @require        https://cdn.staticfile.org/vue/2.7.0/vue.min.js
 // @require        https://unpkg.com/element-ui/lib/index.js
 // @grant          GM_log
@@ -158,14 +159,6 @@
   )
 
   let vm = null;
-  const createTabBox = () => {
-    const tabBox = document.createElement('div')
-    tabBox.id = 'app';
-    tabBox.innerHTML = `
-      <el-link type="success">成功执行：</el-link>
-    `
-    $('#customization-chat-room').appendChild(tabBox);
-  }
 
   // 本地调试ChatGPT的iframe
   const domain = 'http://localhost:3000/#/';
@@ -176,6 +169,24 @@
   const isDomain = (platform) => {
     return window.location.host.includes(platform);
   };
+
+  const setGMAPI = () => {
+    unsafeWindow.GM_log = GM_log;
+    unsafeWindow.GM_notification = GM_notification;
+    unsafeWindow.unsafeWindow = unsafeWindow;
+    unsafeWindow.GM_addStyle = GM_addStyle;
+    unsafeWindow.GM_setValue = GM_setValue;
+    unsafeWindow.GM_getValue = GM_getValue;
+    unsafeWindow.GM_setClipboard = GM_setClipboard;
+    unsafeWindow.GM_xmlhttpRequest = GM_xmlhttpRequest;
+    unsafeWindow.GM_addElement = GM_addElement;
+    unsafeWindow.GM_openInTab = GM_openInTab;
+    unsafeWindow.GM_getResourceText = GM_getResourceText;
+    unsafeWindow.GM_registerMenuCommand = GM_registerMenuCommand;
+    unsafeWindow.GM_info = GM_info;
+  }
+  setGMAPI()
+
   const getSearchContent = () => {
     if (isDomain('baidu')) {
       return $('#kw').value;
@@ -625,19 +636,6 @@
   };
 
   const evalCode = (content) => {
-    // 定义要执行的油猴脚本代码
-    var code = `
-        GM_addStyle(`
-            /* 样式代码 */
-        `);
-    `;
-
-    // 手动传入 GM_addStyle 函数，使用 Function 构造函数创建动态函数
-    var dynamicFunc = new Function('GM_addStyle', code);
-
-    // 调用动态函数
-    dynamicFunc(GM_addStyle);
-
     const myFunc = new Function(content);
     myFunc();
   }
@@ -881,13 +879,14 @@
           content: getSearchContent()
         })
         $('#answer').innerHTML = '加载中...'
+        $('#copy').addEventListener('click', () => {
+          const text = $('#answer').innerHTML;
+          console.log('text', text);
+          copyToClipboard(text);
+        });
+        $('#footer').style.display = 'flex';
       }
     })
-    $('#copy').addEventListener('click', () => {
-      const text = $('#answer').innerHTML;
-      console.log('text', text);
-      copyToClipboard(text);
-    });
   };
 
   // 谷歌搜索ChatGPT应答
@@ -1077,13 +1076,6 @@
           console.log('chatgpt-web', event.data, GM_addStyle);
           const { content, key } = event.data.data
           if (event.data.type === 'code') {
-
-            const GM_apis = `
-              const GM_info = {};
-              function GM_addStyle(css) {} // GM_addStyle 需要在运行时注入样式，这里使用空函数代替
-              // 其他的 GM_* API 也需要按需注入到这里
-            `;
-            // 将 GM_* API 加入当前作用域
             evalCode(content);
             const chatgptKey = `chatgpt-${key}`
             const item = localStorage.getItem(chatgptKey)
@@ -1111,7 +1103,6 @@
           if (event.data.type === 'search') {
             $('#answer').innerHTML =
               event.data.data.content;
-            $('#footer').style.display = 'flex';
             $('#toolbar').style.display = 'inline-flex';
           }
           if(event.data.type === 'selectText') {
@@ -1451,7 +1442,6 @@
 
     createDialogBox();
     handleTextAutoHeight();
-    // createTabBox();
 
     vm = new Vue({
       el: '#customization-chat-room',
@@ -1462,9 +1452,11 @@
       },
       mounted() {
         console.log('==mounted')
+        this.setGMAPI();
         window.addEventListener("storage", this.handleStorageChange);
         this.handleStorageChange()
         $('.el-tabs__content').style.height = window.innerHeight - 50 + 'px';
+        $('.el-tabs__content').style.overflowY = 'hidden';
       },
       beforeUnmount() {
         window.removeEventListener("storage", this.handleStorageChange)
@@ -1477,11 +1469,29 @@
           } else if(tab.name === 'plugins') {
             this.isGetNew = false;
             $('.plugins-box') && ($('.plugins-box').style.height = window.innerHeight - 80 + 'px');
+            $('.el-tabs__content').style.overflowY = 'auto';
+          } else {
+            $('.el-tabs__content').style.overflowY = 'hidden';
           }
         },
+        setGMAPI() {
+          unsafeWindow.GM_log = GM_log;
+          unsafeWindow.GM_notification = GM_notification;
+          unsafeWindow.unsafeWindow = unsafeWindow;
+          unsafeWindow.GM_addStyle = GM_addStyle;
+          unsafeWindow.GM_setValue = GM_setValue;
+          unsafeWindow.GM_getValue = GM_getValue;
+          unsafeWindow.GM_setClipboard = GM_setClipboard;
+          unsafeWindow.GM_xmlhttpRequest = GM_xmlhttpRequest;
+          unsafeWindow.GM_addElement = GM_addElement;
+          unsafeWindow.GM_openInTab = GM_openInTab;
+          unsafeWindow.GM_getResourceText = GM_getResourceText;
+          unsafeWindow.GM_registerMenuCommand = GM_registerMenuCommand;
+          unsafeWindow.GM_info = GM_info;
+        },
         evalCode(content) {
-          console.log('unsafeWindow', unsafeWindow)
-          const myFunc = new Function(content);
+          console.log('GM_addStyle', GM_addStyle, window)
+          const myFunc = () => content;
           myFunc();
         },
         handleCheckboxChange(isChecked, item) {
@@ -1495,16 +1505,31 @@
         },
         updateStorageItem(item) {
           console.log('updateStorageItem', item)
-          localStorage.setItem(item.key, JSON.stringify(item));
+          localStorage.setItem(item.key, JSON.stringify({
+            ...item,
+            ...getUrls(item.content),
+            ...getCodeInfo(item.content)
+          }));
           this.handleStorageChange()
+        },
+        isScriptMatched(matches) {
+          const scriptMatchPatterns = GM_info.script.matches;
+          const currentURL = window.location.href;
+          console.log('mat', matches, scriptMatchPatterns)
+          // 检查油猴脚本匹配模式是否包含当前网页的网址
+          return matches.some(pattern => {
+            const regex = new RegExp(pattern);
+            return regex.test(currentURL);
+          });
         },
         handleStorageChange() {
           this.localCode = [];
           for(let key in localStorage){
             if(key.split('-')[0] === 'chatgpt'){
               const storageItem = JSON.parse(localStorage.getItem(key))
+              console.log('handleStorageChange', storageItem.content)
               this.localCode.push(storageItem);
-              if(storageItem.isChecked) {
+              if(storageItem.isChecked && this.isScriptMatched(storageItem.matches) && !this.isScriptMatched(storageItem.blocks)) {
                 evalCode(storageItem.content);
               }
             }
