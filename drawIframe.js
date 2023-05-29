@@ -8,7 +8,6 @@
 // @updateURL      https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @downloadURL    https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @match          http*://*/*
-// @run-at         document-end
 // @require        https://cdn.staticfile.org/vue/2.7.0/vue.min.js
 // @require        https://unpkg.com/element-ui/lib/index.js
 // @grant          GM_log
@@ -126,6 +125,12 @@
     }
     .flex-1 {
       flex: 1;
+    }
+    .flex-0.2 {
+      flex: 0.2
+    }
+    .flex-8 {
+      flex: 8
     }
     .items-center {
       align-items: center;
@@ -403,7 +408,7 @@
                 插件管理
             </el-badge>
 
-            <div v-if="localCode.length > 0" class="tab-item">
+            <div v-if="localCode.length > 0" class="tab-item plugins-box">
               <el-alert
                 class="mb-1"
                 title="勾选即下次进入网页自动生效，单击按钮即单次执行生效"
@@ -423,14 +428,20 @@
                     autosize
                     v-model="item.content"
                   ></el-input>
-                  <div class="flex justify-center">
+                  <div class="flex mb-1 justify-center">
                     <el-button class="flex-1" size="mini" @click.stop="updateStorageItem(item)">更新</el-button>
                     <el-button class="flex-1" size="mini" @click.stop="deleteStorageItem(item.key)">删除</el-button>
                   </div>
+                  <ul class="flex flex-col">
+                    <li class="flex items-center match-item" :key="item.key" v-for="(match, index) in item.matches">
+                      <i class="flex flex-1 el-icon-delete justify-center" @click="deleteUrl(item.key)"></i>
+                      <el-input type="mini" class="flex-8 mb-1" v-model="item.matches[index]"></el-input>
+                    </li>
+                  </ul>
                 </el-collapse-item>
               </el-collapse>
             </div>
-            <div v-else class="tab-item">
+            <div v-else class="tab-item plugins-box">
               暂无插件，请在聊天中生成油猴脚本点击运行代码即可生成。
             </div>
           </el-tab-pane>
@@ -441,17 +452,6 @@
         </el-tab-pane>
       </el-tabs>
     `;
-
-            // <div :key="item.key" v-for="item in localCode">
-            //   <el-checkbox v-model="item.isChecked">
-            //     <el-button size="mini" @click="evalCode(item.content)">{{item.name}}</el-button>
-            //   </el-checkbox>
-            //   <el-input 
-            //     type="textarea"
-            //     autosize
-            //     v-model="item.content"
-            //   ></el-input>
-            // </div>
     // 将聊天室添加到侧边栏抽屉中
     drawer.appendChild(closeButton);
     drawer.appendChild(chatRoom);
@@ -459,6 +459,7 @@
     // 将悬浮按钮和侧边栏抽屉添加到页面上
     document.body.appendChild(button);
     document.body.appendChild(drawer);
+
 
     // 点击悬浮按钮显示侧边栏抽屉
     button.addEventListener('click', function () {
@@ -472,7 +473,7 @@
     // element
     GM_addStyle(`
       #customization-chat-room .el-tabs {
-        height: 100%;
+        height: inherit;
         background: #e7f8ff;
       }
       .el-tabs__active-bar {
@@ -480,21 +481,22 @@
       }
       
       .el-tabs__content {
-        height: 99%;
+        height: inherit;
         box-sizing: border-box;
+        overflow: auto;
       }
       
       .el-tab-pane {
-        height: 99%;
+        height: inherit;
         box-sizing: border-box;
       }
       .el-tabs__header {
-        margin: 0;
+        margin: 0 0 10px;
         padding: 0 10px;
       }
       #chatgpt-iframe {
-        width: 99%;
-        height: 99%;
+        width: 100%;
+        height: inherit;
       }
       .el-collapse-item__header {
         padding: 0 10px;
@@ -510,8 +512,11 @@
     // 美化页面
     GM_addStyle(`
             .tab-item {
-              margin: 10px;
+              padding: 10px;
               height: 100%;
+            }
+            .match-item {
+              width: 100%;
             }
             #customization-chat-room {
                 border-left: 1px solid #e5e8eb;
@@ -1034,6 +1039,24 @@
     return {name};
   }
 
+  // 匹配油猴脚本中生效和不生效的网址
+  function getUrls(script) {
+    const matchRegex = /@match\s*([^]*?)\n/g;
+    const blockRegex = /(\S+)\s*>=\s*0\s*\)/g;
+    let matches, blocks;
+    const urls = {
+      matches: [],
+      blocks: []
+    };
+    while ((matches = matchRegex.exec(script)) !== null) {
+      urls.matches.push(matches[1]);
+    }
+    while ((blocks = blockRegex.exec(script)) !== null) {
+      urls.blocks.push(blocks[1]);
+    }
+    return urls;
+  }
+
   // 处理监听ChatGPT-web的消息
   const handlePostMessage = () => {
     // 父级，在frame处抛出接收事件
@@ -1055,6 +1078,7 @@
                 key: chatgptKey,
                 isChecked: true,
                 name,
+                ...getUrls(content),
               };
             localStorage.setItem(
               chatgptKey, JSON.stringify(storageItem));
@@ -1423,6 +1447,7 @@
         console.log('==mounted')
         window.addEventListener("storage", this.handleStorageChange);
         this.handleStorageChange()
+        $('.el-tabs__content').style.height = window.innerHeight - 50 + 'px';
       },
       beforeUnmount() {
         window.removeEventListener("storage", this.handleStorageChange)
@@ -1434,6 +1459,7 @@
             window.open(domain, '_blank');
           } else if(tab.name === 'plugins') {
             this.isGetNew = false;
+            $('.plugins-box') && ($('.plugins-box').style.height = window.innerHeight - 80 + 'px');
           }
         },
         evalCode(content) {
