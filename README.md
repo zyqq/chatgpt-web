@@ -50,7 +50,7 @@
   - 案例
   - 用户需求精确引导
   
-  <img src="./assets/油猴脚本助手.gif" width="400px" />
+  <img src="./assets/油猴脚本助手.gif"/>
 
 - ✅ 兼容
   - 禁止iframe的网站兼容处理
