@@ -29,26 +29,28 @@
 - ✅ ChatGPT交互
 - ✅  支持搜索同时也询问ChatGPT
 
-  <img src="./assets/search.png" width="400px" />
+  <img src="./assets/搜索增强.png" width="400px" />
 - ✅ 网页内容阅读总结
 
-  <img src="./assets/read.png" width="200px" />
+  <img src="./assets/总结文章.png" width="200px" />
 - ✅ 选中文本
 
-  <img src="./assets/pop.png" width="100px" />
+  <img src="./assets/扩写.png" width="100px" />
 
   - 摘要
   - 语法
   - 解释
   - 解释代码
   
-  <img src="./assets/explain.png" width="200px" />
+  <img src="./assets/解释代码.png" width="200px" />
 
   - 重写
   - 翻译
 - ✅ 油猴脚本助手（已生成prompt模板，待完善30%）
   - 案例
   - 用户需求精确引导
+
+  <video src="./assets/油猴脚本助手.mov" />
 - ✅ 兼容
   - 禁止iframe的网站兼容处理
   - 提供直接跳转网页按钮
