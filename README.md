@@ -49,8 +49,9 @@
 - ✅ 油猴脚本助手（已生成prompt模板，待完善30%）
   - 案例
   - 用户需求精确引导
+  
+  <img src="./assets/油猴脚本助手.gif" width="400px" />
 
-  <video src="./assets/油猴脚本助手.mov" />
 - ✅ 兼容
   - 禁止iframe的网站兼容处理
   - 提供直接跳转网页按钮
