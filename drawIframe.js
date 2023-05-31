@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           网页定制（ChatGPT版）
 // @namespace      http://tampermonkey.net/
-// @version        v1.0.4
+// @version        v1.0.7
 // @author         yiqiuzheng
 // @description    ChatGPT助手，支持搜索增强、选中文本拓展、总结文章以及定制网页！
 // @icon           data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAH1UExURUxpcXeqn3WqnHWonHSpnHWonHWpnG22knWpnHWpnHSmm3apm3SpnHWonHWpnHSonHWpnHWpm3apnXWpnHWpm3WpnP///8fc19fm43mrn67Nxf7///r8+6HFvNPk4JS8ssXb1XirnsDY0sPa1Pj7+qbHv5i/tXeqnvz9/X6uoo65roq2q+Tu7P3+/qrKwqDEu9bm4vP39qfIwPv9/NXl4ezz8Xqsn+nx73msn5/Dusnd2N7q59zp5pC6r4CwpKLFvIOxpszf2oSypsTa1fn7+/P49t/r6JrAt8LZ1L/X0d3q53aqnczf287h3Ie0qc7g3Pr8/LTQybDOxpvBuObv7c/h3PX5+Ory8ODr6OPt65G7sLnTzYWzp/n7+oi1qv7+/tTk4J7Cucve2Z3Cub7X0H+vo8LZ053CuKnJwff6+tnn4/3+/fD29XytoYWzqJe+tJa+tHapnHeqnaHEu8vf2oGxpazLw3utoMre2ZW9s7XRyu/19H2uou/186XHv6jJwNDi3sjd2OLt6u308ufw7tfm4rjTzK3MxOjw7tvp5dHi3sjd15m/tvL39q/Nxvb5+OPu64y3rIOyptnn5LbSy+Ds6eHs6tbl4cHZ0/v8/H6vo4GwpZ7Dus/h3fb6+ZK7sfT49/f6+aLFvavLw6zLxM3g28bc1pQLf2QAAAAVdFJOUwAtv5bz1PQH/dUuj5WQ/CyYwJHykqKEGP8AAAAJcEhZcwAAAHYAAAB2AU57JggAAAIcSURBVDjLhdNle9swEABgFdK0Kw7uHMfp6iTeAksaThpoUmZuV1x5zMxbx8wM7Xj7nZNjx/L2rNl9kXR6H51snwmhsWFTWQn8FSWGygKihLGmFP4ZpUXG7P5GWDcKZVEDeaKC1mfnHxUvoSV19YQOVFWTLdpiUfJ2POx/jOEzAy4tWU7KctPG95FpOjT0IA2PT80aSHEOpKQ5mSUxIA7bD2OzI5vdTNTt1QXBDvAxMT/7qkE+h8PdyoYC+DX0YgYyX4W+FwBunqYOhpp0YAl/1eN22Or5DPD8Jd6sBTiOZgYa8SfUysAMH+wWW/AK3ndbUWRADKUVMGIex1YrRGcs3uvYxcCzKVCAJTb66FZsFGDXTgHPMjD2WgWcFeCkHd/uoOshj0MD16QoLOI2+Q406ifpPXh4gisaOIXD4JiZXUoqwARx/Ab80zB7TJMzmK17nr4BK2eCOnocJGMMBBH9tO6FqYhveUJSwZsxBrpRDDltl6G3G7/8+K6AtLOZARu65hYwcLfL8s4l30EGCTzGwH6MA3Tew9u0Tp1HBmYOT+u+xZ62nl4AB91uGRQ+ZWAZ53HQqgMwgn3n6BC90+bl0nLJB51qH+QaphUD3EWuHVNuuhiQwlrPaS3n6zhEW+2G3I3TkSE3A5XalG860o/j/sSkcGAf62tS8MdvFfe3Oyf2tugyhBRB3qC/XuF/ADFWVOUHhFSXG4rXA78BYbiLJDUXqsMAAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII=
@@ -871,87 +871,44 @@
       domain
     );
   };
-
   const extractArticle = () => {
-    // 判断节点是否是文本节点
     function isText(node) {
       return node.nodeType === Node.TEXT_NODE;
     }
 
-    // 获取节点的纯文本内容
     function getTextContent(node) {
       return node.textContent.trim();
     }
 
-    // 判断节点是否是文章相关的节点
     function isArticleNode(node) {
-      // 判断节点是否是 P 标签
-      if (node.nodeName === 'P') {
-        // 判断节点是否是空节点
-        if (getTextContent(node) === '') {
-          return false;
-        }
-
-        return true;
+      if (node.nodeName === 'P' || /^H[1-6]$/.test(node.nodeName)) {
+        return getTextContent(node) !== '';
       }
 
-      // 判断节点是否是 H 标签
-      if (/^H[1-6]$/.test(node.nodeName)) {
-        // 判断节点是否是空节点
-        if (getTextContent(node) === '') {
-          return false;
-        }
-
-        return true;
-      }
-
-      // 判断节点是否是 UL 和 OL 标签
       if (node.nodeName === 'UL' || node.nodeName === 'OL') {
-        // 判断节点下是否有 LI 标签
         return node.querySelector('li') !== null;
       }
 
-      // 判断节点是否是 DIV 标签
       if (node.nodeName === 'DIV') {
-        // 判断节点是否是空节点
-        if (getTextContent(node) === '') {
-          return false;
-        }
-
-        // 判断节点是否属于文章的正文部分
-        if (
-          node.classList.contains('page-main_content') ||
-          node.classList.contains('content-main')
-        ) {
-          return true;
-        }
-
-        return false;
+        return node.classList.contains('page-main_content') || node.classList.contains('content-main');
       }
 
-      // 判断节点是否是 SECTION 和 ARTICLE 标签
       if (node.nodeName === 'SECTION' || node.nodeName === 'ARTICLE') {
-        // 判断节点下是否存在 P、H、UL、OL、DIV 标签
         return node.querySelector('p,h1,h2,h3,h4,h5,h6,ul,ol,div') !== null;
       }
 
       return false;
     }
 
-    // 获取文章相关的节点列表
     function getArticleNodes() {
       const articleNodes = [];
 
       function traverse(node) {
-        // 如果节点是文章相关的节点，则加入列表
         if (isArticleNode(node)) {
           articleNodes.push(node);
         }
 
-        // 遍历节点的子节点
-        node.childNodes.forEach((childNode) => {
-          traverse(childNode);
-        });
+        node.childNodes.forEach(traverse);
       }
 
       traverse(document.body);
@@ -959,40 +916,35 @@
       return articleNodes;
     }
 
-    // 获取文章的纯文本内容
     function getArticleText() {
       const articleNodes = getArticleNodes();
 
-      let text = '';
+      const articleText = articleNodes.map(node => getTextContent(node)).join('\n');
 
-      articleNodes.forEach((node) => {
-        text += getTextContent(node) + '\n';
-      });
-
-      // 去掉多余的空格和换行符
-      text = text.replace(/\s{2,}/g, ' ').trim();
-
-      return text;
+      return articleText.replace(/\s+/g, ' ').trim();
     }
 
     const result = getArticleText();
+
     const splitStr = (str) => {
-      const maxLength = 4400; // 每个字符串的最大长度
-      const strArr = []; // 存放切割后的字符串数组
-      let temp = ''; // 临时变量用来拼接字符串
+      const maxLength = 4400;
+      const strArr = [];
+      let temp = '';
       for (let i = 0; i < str.length; i++) {
         temp += str[i];
         if ((i + 1) % maxLength === 0 || i === str.length - 1) {
-          // 到达最大长度，或者到达字符串最后
           strArr.push(temp);
           temp = '';
         }
       }
       return strArr;
     };
+
     const formatResult = splitStr(result);
+
     return formatResult;
   };
+
 
   // 计算输入框大小
   // input：(必填)输入框
