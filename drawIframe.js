@@ -304,7 +304,7 @@
   // 获取chatgpt生成的代码
   var getCode = function (config) {
     // 调用chatgpt接口，获取生成的代码
-    var url = 'https://chat.i.woa.com/api/generate';
+    var url = '';
     var headers = {
       'Content-Type': 'application/json',
     };
