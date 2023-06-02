@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name           网页定制（ChatGPT版）
 // @namespace      http://tampermonkey.net/
-// @version        v1.0.5
+// @version        v1.1.4
 // @author         yiqiuzheng
-// @description    ChatGPT助手，支持搜索增强、选中文本拓展、总结文章以及定制网页！
+// @description    ChatGPT助手，支持搜索增强、选中文本拓展、总结文章以及定制网页！网页版地址：https://chatgpt-echo.zeabur.app/ ，可关注微信公众号秋博士，获取ChatGPT访问密码
 // @icon           data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAH1UExURUxpcXeqn3WqnHWonHSpnHWonHWpnG22knWpnHWpnHSmm3apm3SpnHWonHWpnHSonHWpnHWpm3apnXWpnHWpm3WpnP///8fc19fm43mrn67Nxf7///r8+6HFvNPk4JS8ssXb1XirnsDY0sPa1Pj7+qbHv5i/tXeqnvz9/X6uoo65roq2q+Tu7P3+/qrKwqDEu9bm4vP39qfIwPv9/NXl4ezz8Xqsn+nx73msn5/Dusnd2N7q59zp5pC6r4CwpKLFvIOxpszf2oSypsTa1fn7+/P49t/r6JrAt8LZ1L/X0d3q53aqnczf287h3Ie0qc7g3Pr8/LTQybDOxpvBuObv7c/h3PX5+Ory8ODr6OPt65G7sLnTzYWzp/n7+oi1qv7+/tTk4J7Cucve2Z3Cub7X0H+vo8LZ053CuKnJwff6+tnn4/3+/fD29XytoYWzqJe+tJa+tHapnHeqnaHEu8vf2oGxpazLw3utoMre2ZW9s7XRyu/19H2uou/186XHv6jJwNDi3sjd2OLt6u308ufw7tfm4rjTzK3MxOjw7tvp5dHi3sjd15m/tvL39q/Nxvb5+OPu64y3rIOyptnn5LbSy+Ds6eHs6tbl4cHZ0/v8/H6vo4GwpZ7Dus/h3fb6+ZK7sfT49/f6+aLFvavLw6zLxM3g28bc1pQLf2QAAAAVdFJOUwAtv5bz1PQH/dUuj5WQ/CyYwJHykqKEGP8AAAAJcEhZcwAAAHYAAAB2AU57JggAAAIcSURBVDjLhdNle9swEABgFdK0Kw7uHMfp6iTeAksaThpoUmZuV1x5zMxbx8wM7Xj7nZNjx/L2rNl9kXR6H51snwmhsWFTWQn8FSWGygKihLGmFP4ZpUXG7P5GWDcKZVEDeaKC1mfnHxUvoSV19YQOVFWTLdpiUfJ2POx/jOEzAy4tWU7KctPG95FpOjT0IA2PT80aSHEOpKQ5mSUxIA7bD2OzI5vdTNTt1QXBDvAxMT/7qkE+h8PdyoYC+DX0YgYyX4W+FwBunqYOhpp0YAl/1eN22Or5DPD8Jd6sBTiOZgYa8SfUysAMH+wWW/AK3ndbUWRADKUVMGIex1YrRGcs3uvYxcCzKVCAJTb66FZsFGDXTgHPMjD2WgWcFeCkHd/uoOshj0MD16QoLOI2+Q406ifpPXh4gisaOIXD4JiZXUoqwARx/Ab80zB7TJMzmK17nr4BK2eCOnocJGMMBBH9tO6FqYhveUJSwZsxBrpRDDltl6G3G7/8+K6AtLOZARu65hYwcLfL8s4l30EGCTzGwH6MA3Tew9u0Tp1HBmYOT+u+xZ62nl4AB91uGRQ+ZWAZ53HQqgMwgn3n6BC90+bl0nLJB51qH+QaphUD3EWuHVNuuhiQwlrPaS3n6zhEW+2G3I3TkSE3A5XalG860o/j/sSkcGAf62tS8MdvFfe3Oyf2tugyhBRB3qC/XuF/ADFWVOUHhFSXG4rXA78BYbiLJDUXqsMAAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII=
 // @updateURL      https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
 // @downloadURL    https://raw.githubusercontent.com/zyqq/chatgpt-web/main/drawIframe.js
@@ -38,16 +38,16 @@
   linkEl.href =
     'https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css';
 
-  $('head').appendChild(linkEl);
+  $('head').insertBefore(linkEl, $('head').firstChild);
 
   // 聊天按钮样式
   GM_addStyle(`
-    .continue-chat {
+    #chatBtn.continue-chat {
         height: 32px;
         border-radius: 16px;
         font-weight: 400;
     }
-    .primary-outline-button.btn {
+    #chatBtn.primary-outline-button.btn {
         background: #ffffff;
         border: 1px solid rgba(56,114,224,.48);
         border-radius: 6px;
@@ -60,7 +60,7 @@
         color: #3872e0;
         line-height: 24px;
     }
-    .primary-outline-button.btn:hover {
+    #chatBtn.primary-outline-button.btn:hover {
         background: #eff3ff;
     }
     .monica-btn {
@@ -138,7 +138,7 @@
     .justify-center {
       justify-content: center;
     }
-    .mb-1 {
+    .chatgpt-mb-1 {
       margin-bottom: 10px;
     }
     .cursor-pointer {
@@ -159,7 +159,7 @@
   let vm = null;
 
   // 本地调试ChatGPT的iframe
-  // const domain = 'http://localhost:3000/#/';
+  //const domain = 'http://localhost:3000/#/';
   // 线上ChatGPT的iframe地址
   const domain = 'https://chatgpt-echo.zeabur.app/';
 
@@ -413,7 +413,7 @@
 
             <div v-if="localCode.length > 0" class="tab-item plugins-box">
               <el-alert
-                class="mb-1"
+                class="chatgpt-mb-1"
                 title="勾选即下次进入网页自动生效，单击按钮即单次执行生效"
                 type="success"
                 show-icon>
@@ -425,13 +425,13 @@
                       <el-button size="mini" @click.stop="evalCode(item.content)">{{item.name}}</el-button>
                     </el-checkbox>
                   </template>
-                  <el-input 
-                    class="mb-1"
+                  <el-input
+                    class="chatgpt-mb-1"
                     type="textarea"
                     autosize
                     v-model="item.content"
                   ></el-input>
-                  <div class="flex mb-1 justify-center">
+                  <div class="flex chatgpt-mb-1 justify-center">
                     <el-button class="flex-1" size="mini" @click.stop="updateStorageItem(item)">更新</el-button>
                     <el-button class="flex-1" size="mini" @click.stop="deleteStorageItem(item.key)">删除</el-button>
                   </div>
@@ -475,16 +475,17 @@
       .el-tabs__active-bar {
         width: 58px!important;
       }
-      
+
       .el-tabs__content {
         height: inherit;
         box-sizing: border-box;
         overflow: auto;
       }
-      
+
       .el-tab-pane {
         height: inherit;
         box-sizing: border-box;
+        width: 100%;
       }
       .el-tabs__header {
         margin: 0 0 10px;
@@ -871,87 +872,44 @@
       domain
     );
   };
-
   const extractArticle = () => {
-    // 判断节点是否是文本节点
     function isText(node) {
       return node.nodeType === Node.TEXT_NODE;
     }
 
-    // 获取节点的纯文本内容
     function getTextContent(node) {
       return node.textContent.trim();
     }
 
-    // 判断节点是否是文章相关的节点
     function isArticleNode(node) {
-      // 判断节点是否是 P 标签
-      if (node.nodeName === 'P') {
-        // 判断节点是否是空节点
-        if (getTextContent(node) === '') {
-          return false;
-        }
-
-        return true;
+      if (node.nodeName === 'P' || /^H[1-6]$/.test(node.nodeName)) {
+        return getTextContent(node) !== '';
       }
 
-      // 判断节点是否是 H 标签
-      if (/^H[1-6]$/.test(node.nodeName)) {
-        // 判断节点是否是空节点
-        if (getTextContent(node) === '') {
-          return false;
-        }
+      // if (node.nodeName === 'UL' || node.nodeName === 'OL') {
+      //   return node.querySelector('li') !== null;
+      // }
 
-        return true;
-      }
-
-      // 判断节点是否是 UL 和 OL 标签
-      if (node.nodeName === 'UL' || node.nodeName === 'OL') {
-        // 判断节点下是否有 LI 标签
-        return node.querySelector('li') !== null;
-      }
-
-      // 判断节点是否是 DIV 标签
       if (node.nodeName === 'DIV') {
-        // 判断节点是否是空节点
-        if (getTextContent(node) === '') {
-          return false;
-        }
-
-        // 判断节点是否属于文章的正文部分
-        if (
-          node.classList.contains('page-main_content') ||
-          node.classList.contains('content-main')
-        ) {
-          return true;
-        }
-
-        return false;
+        return node.classList.contains('page-main_content') || node.classList.contains('content-main');
       }
 
-      // 判断节点是否是 SECTION 和 ARTICLE 标签
       if (node.nodeName === 'SECTION' || node.nodeName === 'ARTICLE') {
-        // 判断节点下是否存在 P、H、UL、OL、DIV 标签
         return node.querySelector('p,h1,h2,h3,h4,h5,h6,ul,ol,div') !== null;
       }
 
       return false;
     }
 
-    // 获取文章相关的节点列表
     function getArticleNodes() {
       const articleNodes = [];
 
       function traverse(node) {
-        // 如果节点是文章相关的节点，则加入列表
         if (isArticleNode(node)) {
           articleNodes.push(node);
         }
 
-        // 遍历节点的子节点
-        node.childNodes.forEach((childNode) => {
-          traverse(childNode);
-        });
+        node.childNodes.forEach(traverse);
       }
 
       traverse(document.body);
@@ -959,40 +917,35 @@
       return articleNodes;
     }
 
-    // 获取文章的纯文本内容
     function getArticleText() {
       const articleNodes = getArticleNodes();
 
-      let text = '';
+      const articleText = articleNodes.map(node => getTextContent(node)).join('\n');
 
-      articleNodes.forEach((node) => {
-        text += getTextContent(node) + '\n';
-      });
-
-      // 去掉多余的空格和换行符
-      text = text.replace(/\s{2,}/g, ' ').trim();
-
-      return text;
+      return articleText.replace(/\s+/g, ' ').trim();
     }
 
     const result = getArticleText();
+
     const splitStr = (str) => {
-      const maxLength = 4400; // 每个字符串的最大长度
-      const strArr = []; // 存放切割后的字符串数组
-      let temp = ''; // 临时变量用来拼接字符串
+      const maxLength = 4400;
+      const strArr = [];
+      let temp = '';
       for (let i = 0; i < str.length; i++) {
         temp += str[i];
         if ((i + 1) % maxLength === 0 || i === str.length - 1) {
-          // 到达最大长度，或者到达字符串最后
           strArr.push(temp);
           temp = '';
         }
       }
       return strArr;
     };
+
     const formatResult = splitStr(result);
+
     return formatResult;
   };
+
 
   // 计算输入框大小
   // input：(必填)输入框
@@ -1060,7 +1013,18 @@
             const article = extractArticle();
             postMsg({ type: 'read', content: article });
           }
-          if (event.data.type === 'ready') {
+          if (event.data.type === 'ready' && (isDomain('google') || isDomain('baidu'))) {
+            const rId = isDomain('google') ? 'rhs' : 'content_right'
+
+            const searchBox = document.getElementById(rId);
+            const contentBox = document.getElementById(
+              isDomain('google') ? 'rcnt' : 'container'
+            );
+            if(!searchBox) {
+              const rIdBox = document.createElement('rId');
+              rIdBox.id = rId;
+              contentBox.appendChild(rIdBox);
+            }
             !$('#chatgpt-search-enhance') && generateSearchEnhance();
           }
           if (event.data.type === 'search') {
@@ -1327,11 +1291,11 @@
     const x = event.clientX; // 获取鼠标点击的X坐标
     const y = event.clientY; // 获取鼠标点击的Y坐标
     let selectedElement = document.getSelection()?.focusNode?.parentNode;
-    console.log('选中的元素是：', document.getSelection(), selectedElement, {
-      rect,
-      x,
-      y,
-    });
+    // console.log('选中的元素是：', document.getSelection(), selectedElement, {
+    //   rect,
+    //   x,
+    //   y,
+    // });
 
     // 判断鼠标点击的坐标是否在元素位置之内
     if (
@@ -1340,9 +1304,9 @@
       y >= rect.top &&
       y <= rect.bottom
     ) {
-      console.log('点击的位置处于该元素之中！');
+      // console.log('点击的位置处于该元素之中！');
     } else {
-      console.log('点击的位置不在该元素之中。');
+      // console.log('点击的位置不在该元素之中。');
     }
     return (
       x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
@@ -1362,6 +1326,11 @@
         setDialogBoxPos();
       } else {
         let selectedElement = document.getSelection()?.focusNode?.parentNode;
+        const classList = selectedElement?.classList?.value
+        console.log(`点击元素: ${selectedElement}, '类名为：${classList}, id为：${selectedElement?.id}`)
+        if(classList && !classList.includes('chat') && !classList.includes('tab-item-badge')) {
+          // postMsg({type: 'clickElement', content: classList})
+        }
         !isInDialogBox() && (dialogBox.style.display = 'none');
       }
     });
@@ -1508,5 +1477,10 @@
   };
 
   // 执行主函数
-  main();
+  const isQqMails = () => isDomain('mail.qq.com');
+  if (window.self !== window.top && isQqMails()) {
+    main();
+  } else if(window.self === window.top && !isQqMails()) {
+    main();
+  }
 })();
