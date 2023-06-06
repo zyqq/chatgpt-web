@@ -27,6 +27,14 @@
 ## 三、计划内容
 
 - ✅ ChatGPT交互
+  - 自定义prompt与角色
+
+  <img src="./assets/面具.png" width="400px" />
+
+  - 支持Midjourney出图
+
+  <img src="./assets/ironmanwithredhat.png" width="400px" />
+
 - ✅  支持搜索同时也询问ChatGPT
 
   <img src="./assets/搜索增强.png" width="400px" />
@@ -82,4 +90,6 @@
 
 ## 七、联系方式
 
-邮箱：252545095@qq.com
+微信公众号关注：秋博士，可获取访问密码
+
+<img src="./assets/秋博士.jpeg" width="200px" />

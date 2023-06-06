@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           网页定制（ChatGPT版）
 // @namespace      http://tampermonkey.net/
-// @version        v1.1.6
+// @version        v1.1.7
 // @author         yiqiuzheng
 // @description    ChatGPT助手，支持搜索增强、选中文本拓展、总结文章以及定制网页！网页版地址：https://chatgpt-echo.zeabur.app/ ，可关注微信公众号秋博士，获取ChatGPT访问密码
 // @icon           data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAH1UExURUxpcXeqn3WqnHWonHSpnHWonHWpnG22knWpnHWpnHSmm3apm3SpnHWonHWpnHSonHWpnHWpm3apnXWpnHWpm3WpnP///8fc19fm43mrn67Nxf7///r8+6HFvNPk4JS8ssXb1XirnsDY0sPa1Pj7+qbHv5i/tXeqnvz9/X6uoo65roq2q+Tu7P3+/qrKwqDEu9bm4vP39qfIwPv9/NXl4ezz8Xqsn+nx73msn5/Dusnd2N7q59zp5pC6r4CwpKLFvIOxpszf2oSypsTa1fn7+/P49t/r6JrAt8LZ1L/X0d3q53aqnczf287h3Ie0qc7g3Pr8/LTQybDOxpvBuObv7c/h3PX5+Ory8ODr6OPt65G7sLnTzYWzp/n7+oi1qv7+/tTk4J7Cucve2Z3Cub7X0H+vo8LZ053CuKnJwff6+tnn4/3+/fD29XytoYWzqJe+tJa+tHapnHeqnaHEu8vf2oGxpazLw3utoMre2ZW9s7XRyu/19H2uou/186XHv6jJwNDi3sjd2OLt6u308ufw7tfm4rjTzK3MxOjw7tvp5dHi3sjd15m/tvL39q/Nxvb5+OPu64y3rIOyptnn5LbSy+Ds6eHs6tbl4cHZ0/v8/H6vo4GwpZ7Dus/h3fb6+ZK7sfT49/f6+aLFvavLw6zLxM3g28bc1pQLf2QAAAAVdFJOUwAtv5bz1PQH/dUuj5WQ/CyYwJHykqKEGP8AAAAJcEhZcwAAAHYAAAB2AU57JggAAAIcSURBVDjLhdNle9swEABgFdK0Kw7uHMfp6iTeAksaThpoUmZuV1x5zMxbx8wM7Xj7nZNjx/L2rNl9kXR6H51snwmhsWFTWQn8FSWGygKihLGmFP4ZpUXG7P5GWDcKZVEDeaKC1mfnHxUvoSV19YQOVFWTLdpiUfJ2POx/jOEzAy4tWU7KctPG95FpOjT0IA2PT80aSHEOpKQ5mSUxIA7bD2OzI5vdTNTt1QXBDvAxMT/7qkE+h8PdyoYC+DX0YgYyX4W+FwBunqYOhpp0YAl/1eN22Or5DPD8Jd6sBTiOZgYa8SfUysAMH+wWW/AK3ndbUWRADKUVMGIex1YrRGcs3uvYxcCzKVCAJTb66FZsFGDXTgHPMjD2WgWcFeCkHd/uoOshj0MD16QoLOI2+Q406ifpPXh4gisaOIXD4JiZXUoqwARx/Ab80zB7TJMzmK17nr4BK2eCOnocJGMMBBH9tO6FqYhveUJSwZsxBrpRDDltl6G3G7/8+K6AtLOZARu65hYwcLfL8s4l30EGCTzGwH6MA3Tew9u0Tp1HBmYOT+u+xZ62nl4AB91uGRQ+ZWAZ53HQqgMwgn3n6BC90+bl0nLJB51qH+QaphUD3EWuHVNuuhiQwlrPaS3n6zhEW+2G3I3TkSE3A5XalG860o/j/sSkcGAf62tS8MdvFfe3Oyf2tugyhBRB3qC/XuF/ADFWVOUHhFSXG4rXA78BYbiLJDUXqsMAAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII=
@@ -406,6 +406,23 @@
             <iframe id="chatgpt-iframe" src="${domain}"></iframe>
           </div>
         </el-tab-pane>
+        <el-tab-pane label="更新日志" name="log">
+          <div class="tab-item">
+          <el-result subTitle="关注微信公众号：秋博士，获取访问密码">
+            <template slot="icon">
+              <el-image src="https://i.postimg.cc/dtWjSGDN/me.jpg"></el-image>
+            </template>
+            <template slot="extra">
+              <el-button @click="window.open('https://greasyfork.org/zh-CN/scripts/467425-%E7%BD%91%E9%A1%B5%E5%AE%9A%E5%88%B6-chatgpt%E7%89%88/feedback', '_blank')" type="primary" size="medium">觉得好用？请给个五星好评⭐️~</el-button>
+            </template>
+          </el-result>
+            <el-collapse v-model="activeCollapse">
+              <el-collapse-item :key="version.id" v-for="(version, index) in logs" :title="version.title" :name="version.id">
+                <div :key="detail" v-for="detail in version.content">{{detail}}</div>
+              </el-collapse-item>
+            </el-collapse>
+          </div>
+        </el-tab-pane>
         <el-tab-pane name="plugins">
             <el-badge label="插件管理"  slot="label" :is-dot="isGetNew" class="tab-item-badge">
                 插件管理
@@ -431,7 +448,7 @@
                     autosize
                     v-model="item.content"
                   ></el-input>
-                  <div class="flex chatgpt-mb-1 justify-center">
+                  <div class="flex justify-center chatgpt-mb-1">
                     <el-button class="flex-1" size="mini" @click.stop="updateStorageItem(item)">更新</el-button>
                     <el-button class="flex-1" size="mini" @click.stop="deleteStorageItem(item.key)">删除</el-button>
                   </div>
@@ -442,11 +459,11 @@
               暂无插件，请在聊天中生成油猴脚本点击运行代码即可生成。
             </div>
           </el-tab-pane>
-        <el-tab-pane label="跳转网页版" name="web">
-          <div class="tab-item">
-            跳转网页版
-          </div>
-        </el-tab-pane>
+          <el-tab-pane label="跳转网页版" name="web">
+            <div class="tab-item">
+              跳转网页版
+            </div>
+          </el-tab-pane>
       </el-tabs>
     `;
     // 将聊天室添加到侧边栏抽屉中
@@ -1082,9 +1099,14 @@
       </div>
       <div class="action-bar-lite-window-vuGdUx action-bar-SA76od" style="opacity: 1;">
         <div class="box-NzPGeV">
-          <span id="explain" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
-            <span class="text-wrapper-92ojRl" data-text="解释">
-              <span class="text-0Pw8ng">解释</span>
+          <span id="quickTranslate" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
+            <span class="text-wrapper-92ojRl" data-text="翻译">
+              <span class="text-0Pw8ng">翻译</span>
+            </span>
+          </span>
+          <span id="quickSummary" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
+            <span class="text-wrapper-92ojRl" data-text="总结">
+              <span class="text-0Pw8ng">总结</span>
             </span>
           </span>
       </div>
@@ -1204,7 +1226,17 @@
       clickFn: () => {
         postMsg({
           type: 'selectText',
-          content: `用原文语言概括这段文字：${$('#selectVal').value}`,
+          content: `给一个二年级的学生总结一下：${$('#selectVal').value}`,
+        });
+      },
+      resultId: 'selectResult',
+    });
+    addClickAndPostMsg({
+      targetId: 'quickSummary',
+      clickFn: () => {
+        postMsg({
+          type: 'selectText',
+          content: `给一个二年级的学生总结一下：${$('#selectVal').value}`,
         });
       },
       resultId: 'selectResult',
@@ -1256,7 +1288,17 @@
       clickFn: () => {
         postMsg({
           type: 'selectText',
-          content: `将这段文字翻译成英文：${$('#selectVal').value}`,
+          content: `给出以下文字的中文以及英文翻译：${$('#selectVal').value}。`,
+        });
+      },
+      resultId: 'selectResult',
+    });
+    addClickAndPostMsg({
+      targetId: 'quickTranslate',
+      clickFn: () => {
+        postMsg({
+          type: 'selectText',
+          content: `给出以下文字的中文以及英文翻译：${$('#selectVal').value}。`,
         });
       },
       resultId: 'selectResult',
@@ -1358,6 +1400,26 @@
         activeName: 'chatgpt',
         localCode: [],
         isGetNew: false,
+        activeCollapse: [1],
+        logs: [
+          {
+            title: '版本 1.1.7',
+            id: 1,
+            content: [
+              '1. 支持 Midjourney 出图，聊天框输入/mj即可体验，（如/mj iron man）'
+            ]
+          },
+          {
+            title: '版本 1.1.6',
+            id: 2,
+            content: [
+              '1. 支持百度、谷歌搜索增强',
+              '2. 支持选中文本总结、翻译、扩写、代码解释、解释、语法、问答',
+              '4. 支持一句话生成油猴脚本，插件管理',
+              '3. 支持ChatGPT聊天的完整交互，可自定义prompt、定义角色等等'
+            ]
+          }
+        ]
       },
       mounted() {
         this.setGMAPI();
