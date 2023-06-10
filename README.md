@@ -4,9 +4,23 @@
 
 这是一个定制网页的油猴脚本插件相关代码，最终效果如下：
 
-<video src="./assets/网页定制.mp4"></video>
+<img src="./assets/网页定制2.gif" width="400px" />
 
-## 二、目录结构
+## 二、使用方式
+
+油猴插件下载地址： <https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo>
+
+本文油猴脚本： <https://greasyfork.org/zh-CN/scripts/467425-> 网页定制-chatgpt版（即对应drawIframe.js）
+
+![内容](./assets/script.png)
+
+ChatGPT网页： <https://chatgpt-echo.zeabur.app/>
+
+通过安装油猴插件，再添加脚本代码，即可在每个网页中内嵌一个ChatGPT助手（需要输入自己的API_KEY，可查看ChatGPT注册攻略: <https://km.woa.com/articles/show/571403?kmref=search&from_page=1&no=2> ，也可关注微信公众号秋博士，付费获取访问密码或者代注册ChatGPT账号）。
+
+<img src="./assets/apikey.gif" width="400px" />
+
+## 三、目录结构
 
 ### 1、drawIframe.js
 
@@ -24,7 +38,7 @@
 
 最后将其复制到油猴插件中即可。
 
-## 三、功能点
+## 四、功能点
 
 - ✅ ChatGPT交互
   - 自定义prompt与角色
@@ -66,12 +80,6 @@
 - ✅ 插件市场
   - 用户生成的油猴脚本，点击运行后自动保存插件配置，自动打开
   - 推荐其他插件
-
-## 四、如何使用
-
-安装[油猴插件](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)，将autoUpdatePrivate.js的代码复制到油猴插件中即可。
-
-![内容](./assets/script.png)
 
 ## 五、本地测试
 
