@@ -2,9 +2,9 @@
 
 ## 一、简介
 
-这是一个定制网页的油猴脚本插件相关代码，展示如下：
-![插件](./assets/plugins.png)
-![内容](./assets/chatgpt-iframe.png)
+这是一个定制网页的油猴脚本插件相关代码，最终效果如下：
+
+<video src="./assets/网页定制.mp4"></video>
 
 ## 二、目录结构
 
@@ -24,7 +24,7 @@
 
 最后将其复制到油猴插件中即可。
 
-## 三、计划内容
+## 三、功能点
 
 - ✅ ChatGPT交互
   - 自定义prompt与角色
@@ -93,3 +93,11 @@
 微信公众号关注：秋博士，可获取访问密码
 
 <img src="./assets/秋博士.jpeg" width="200px" />
+
+QQ群：151805744
+
+<img src="./assets/qq.jpg" width="200px" />
+
+捐赠（10块即可联系qq群主代注册ChatGPT）：
+
+<img src="./assets/支付宝.jpg" width="200px" />
