@@ -4,7 +4,7 @@
 
 这是一个定制网页的油猴脚本插件相关代码，最终效果如下：
 
-<img src="./assets/网页定制2.gif" width="400px" />
+<img src="./assets/网页定制2.gif" width="800px" />
 
 ## 二、使用方式
 
@@ -18,7 +18,7 @@ ChatGPT网页： <https://chatgpt-echo.zeabur.app/>
 
 通过安装油猴插件，再添加脚本代码，即可在每个网页中内嵌一个ChatGPT助手（需要输入自己的API_KEY，可查看ChatGPT注册攻略: <https://km.woa.com/articles/show/571403?kmref=search&from_page=1&no=2> ，也可关注微信公众号秋博士，付费获取访问密码或者代注册ChatGPT账号）。
 
-<img src="./assets/apikey.gif" width="400px" />
+<img src="./assets/apikey.gif" width="600px" />
 
 ## 三、目录结构
 
