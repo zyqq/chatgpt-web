@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           网页定制（ChatGPT版）
 // @namespace      http://tampermonkey.net/
-// @version        v1.2.0
+// @version        v1.2.2
 // @author         yiqiuzheng
 // @description    ChatGPT助手，支持搜索增强、选中文本拓展、总结文章以及定制网页！网页版地址：https://chatgpt-echo.zeabur.app/ ，可关注微信公众号秋博士，获取ChatGPT访问密码
 // @icon           data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAH1UExURUxpcXeqn3WqnHWonHSpnHWonHWpnG22knWpnHWpnHSmm3apm3SpnHWonHWpnHSonHWpnHWpm3apnXWpnHWpm3WpnP///8fc19fm43mrn67Nxf7///r8+6HFvNPk4JS8ssXb1XirnsDY0sPa1Pj7+qbHv5i/tXeqnvz9/X6uoo65roq2q+Tu7P3+/qrKwqDEu9bm4vP39qfIwPv9/NXl4ezz8Xqsn+nx73msn5/Dusnd2N7q59zp5pC6r4CwpKLFvIOxpszf2oSypsTa1fn7+/P49t/r6JrAt8LZ1L/X0d3q53aqnczf287h3Ie0qc7g3Pr8/LTQybDOxpvBuObv7c/h3PX5+Ory8ODr6OPt65G7sLnTzYWzp/n7+oi1qv7+/tTk4J7Cucve2Z3Cub7X0H+vo8LZ053CuKnJwff6+tnn4/3+/fD29XytoYWzqJe+tJa+tHapnHeqnaHEu8vf2oGxpazLw3utoMre2ZW9s7XRyu/19H2uou/186XHv6jJwNDi3sjd2OLt6u308ufw7tfm4rjTzK3MxOjw7tvp5dHi3sjd15m/tvL39q/Nxvb5+OPu64y3rIOyptnn5LbSy+Ds6eHs6tbl4cHZ0/v8/H6vo4GwpZ7Dus/h3fb6+ZK7sfT49/f6+aLFvavLw6zLxM3g28bc1pQLf2QAAAAVdFJOUwAtv5bz1PQH/dUuj5WQ/CyYwJHykqKEGP8AAAAJcEhZcwAAAHYAAAB2AU57JggAAAIcSURBVDjLhdNle9swEABgFdK0Kw7uHMfp6iTeAksaThpoUmZuV1x5zMxbx8wM7Xj7nZNjx/L2rNl9kXR6H51snwmhsWFTWQn8FSWGygKihLGmFP4ZpUXG7P5GWDcKZVEDeaKC1mfnHxUvoSV19YQOVFWTLdpiUfJ2POx/jOEzAy4tWU7KctPG95FpOjT0IA2PT80aSHEOpKQ5mSUxIA7bD2OzI5vdTNTt1QXBDvAxMT/7qkE+h8PdyoYC+DX0YgYyX4W+FwBunqYOhpp0YAl/1eN22Or5DPD8Jd6sBTiOZgYa8SfUysAMH+wWW/AK3ndbUWRADKUVMGIex1YrRGcs3uvYxcCzKVCAJTb66FZsFGDXTgHPMjD2WgWcFeCkHd/uoOshj0MD16QoLOI2+Q406ifpPXh4gisaOIXD4JiZXUoqwARx/Ab80zB7TJMzmK17nr4BK2eCOnocJGMMBBH9tO6FqYhveUJSwZsxBrpRDDltl6G3G7/8+K6AtLOZARu65hYwcLfL8s4l30EGCTzGwH6MA3Tew9u0Tp1HBmYOT+u+xZ62nl4AB91uGRQ+ZWAZ53HQqgMwgn3n6BC90+bl0nLJB51qH+QaphUD3EWuHVNuuhiQwlrPaS3n6zhEW+2G3I3TkSE3A5XalG860o/j/sSkcGAf62tS8MdvFfe3Oyf2tugyhBRB3qC/XuF/ADFWVOUHhFSXG4rXA78BYbiLJDUXqsMAAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII=
@@ -151,9 +151,10 @@
   `);
 
   let vm = null;
+  let dialogVm = null;
 
   // 本地调试ChatGPT的iframe
-  // const domain = 'http://localhost:3000/#/';
+  //const domain = 'http://localhost:3000/#/';
   // 线上ChatGPT的iframe地址
   const domain = 'https://chatgpt-echo.zeabur.app/';
 
@@ -161,6 +162,7 @@
     return window.location.host.includes(platform);
   };
 
+  // 设置油猴API，方便油猴脚本助手直接运行代码
   const setGMAPI = () => {
     unsafeWindow.GM_log = GM_log;
     unsafeWindow.GM_notification = GM_notification;
@@ -846,7 +848,7 @@
     return view;
   }
 
-  // 递归更新节点
+  // 流式输出递归更新节点
   function updateNode(element, target) {
     //如果是标签节点
     if (element.nodeType == 1 && element.outerHTML != target.outerHTML) {
@@ -1074,9 +1076,10 @@
             $('#toolbar').style.display = 'inline-flex';
           }
           if (event.data.type === 'selectText') {
-            $('#selectResult').value = event.data.data.content;
-            $('#selectResult').addec;
-            inputSizeChange($('#selectResult'));
+            // $('#selectResult').value = event.data.data.content;
+            // $('#selectResult').addec;
+            // inputSizeChange($('#selectResult'));
+            dialogVm.result =  event.data.data.content;
           }
         }
       },
@@ -1084,100 +1087,129 @@
     );
   };
 
-  let dialogBox = null;
-  function setDialogBoxPos() {
-    let sel = window.getSelection();
-    let range = sel.getRangeAt(0);
-    let rect = range.getBoundingClientRect();
 
-    dialogBox.style.top = rect.bottom + window.pageYOffset + 'px';
-    dialogBox.style.left =
-      (rect.left + rect.right) / 2 + window.pageXOffset + 'px';
-  }
-
-  function addClickAndPostMsg({ targetId, type, content, resultId, clickFn }) {
-    $(`#${targetId}`).addEventListener('click', () => {
-      postMsg({ type, content });
-      $(`#${resultId}`).value = '加载中...';
-      clickFn && clickFn();
-    });
-  }
-
+  // 选中文本的弹出框
   function createDialogBox() {
-    dialogBox = document.createElement('div');
-    dialogBox.id = 'floatDialog';
-    dialogBox.style.position = 'absolute';
-    dialogBox.style.backgroundColor = 'white';
-    dialogBox.style.padding = '10px';
-    dialogBox.style.zIndex = '999';
-    dialogBox.style.display = 'none';
-    dialogBox.style.borderRadius = '8px';
-    dialogBox.style.border = '1px solid #dadce0';
-    const briefContent = document.createElement('div');
-    briefContent.id = 'briefContent';
-    briefContent.style.alignItems = 'center';
-    briefContent.innerHTML = `
-      <div class="brief-title lt-znd2I9">
-        <a class="title"  target="_blank" rel="noreferrer">
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" fill="none" class="user-avatar"><defs><path id="bot_svg__a" d="M0 0h30v30H0z"></path><path id="bot_svg__c" d="M0 0h20.455v20.455H0z"></path></defs><g><rect fill="#E7F8FF" width="30" height="30" rx="10"></rect><mask id="bot_svg__b" fill="#fff"><use xlink:href="#bot_svg__a"></use></mask><g mask="url(#bot_svg__b)"><g transform="translate(4.773 4.773)"><mask id="bot_svg__d" fill="#fff"><use xlink:href="#bot_svg__c"></use></mask><g mask="url(#bot_svg__d)"><path fill-rule="evenodd" d="M19.11 8.37c.17-.52.26-1.06.26-1.61 0-.9-.24-1.79-.71-2.57a5.24 5.24 0 0 0-4.53-2.59c-.37 0-.73.04-1.09.11A5.201 5.201 0 0 0 9.17 0h-.04C6.86 0 4.86 1.44 4.16 3.57A5.11 5.11 0 0 0 .71 6.04C.24 6.83 0 7.72 0 8.63c0 1.27.48 2.51 1.35 3.45-.18.52-.27 1.07-.27 1.61 0 .91.25 1.8.71 2.58 1.13 1.94 3.41 2.94 5.63 2.47a5.18 5.18 0 0 0 3.86 1.71h.05c2.26 0 4.27-1.44 4.97-3.57a5.132 5.132 0 0 0 3.45-2.47c.46-.78.7-1.67.7-2.58 0-1.28-.48-2.51-1.34-3.46ZM8.947 18.158c-.04.03-.08.05-.12.07.7.58 1.57.89 2.48.89h.01c2.14 0 3.88-1.72 3.88-3.83v-4.76c0-.02-.02-.04-.04-.05l-1.74-.99v5.75c0 .23-.13.45-.34.57l-4.13 2.35Zm-.67-1.153 4.17-2.38c.02-.01.03-.03.03-.05v-1.99l-5.04 2.87c-.21.12-.47.12-.68 0l-4.13-2.35c-.04-.02-.09-.06-.12-.07-.04.21-.06.43-.06.65 0 .67.18 1.33.52 1.92v-.01c.7 1.19 1.98 1.92 3.37 1.92.68 0 1.35-.18 1.94-.51ZM3.903 5.168v-.14c-.85.31-1.57.9-2.02 1.68a3.78 3.78 0 0 0-.52 1.91c0 1.37.74 2.64 1.94 3.33l4.17 2.37c.02.01.04.01.06 0l1.75-1-5.04-2.87a.64.64 0 0 1-.34-.57v-4.71Zm13.253 3.337-4.18-2.38c-.02 0-.04 0-.06.01l-1.74.99 5.04 2.87c.21.12.34.34.34.58v4.85c1.52-.56 2.54-1.99 2.54-3.6 0-1.37-.74-2.63-1.94-3.32ZM8.014 5.83c-.02.01-.03.03-.03.05v1.99L13.024 5a.692.692 0 0 1 .68 0l4.13 2.35c.04.02.08.05.12.07.03-.21.05-.43.05-.65 0-2.11-1.74-3.83-3.88-3.83-.68 0-1.35.18-1.94.51l-4.17 2.38Zm1.133-4.492c-2.15 0-3.89 1.72-3.89 3.83v4.76c0 .02.02.03.03.04l1.75 1v-5.75c0-.23.13-.45.34-.57l4.13-2.35c.04-.03.09-.06.12-.07-.7-.58-1.58-.89-2.48-.89ZM7.983 11.51l2.24 1.27 2.25-1.27V8.95l-2.25-1.28-2.24 1.28v2.56Z" style="fill: rgb(31, 148, 140);"></path></g></g></g></g></svg>
-        </a>
-      </div>
-      <div class="action-bar-lite-window-vuGdUx action-bar-SA76od" style="opacity: 1;">
-        <div class="box-NzPGeV">
-          <span id="quickTranslate" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
-            <span class="text-wrapper-92ojRl" data-text="翻译">
-              <span class="text-0Pw8ng">翻译</span>
+    const dialogBox = document.createElement('div');
+    // dialogBox.id="floatDialog"
+    dialogBox.innerHTML = `
+      <div id="floatDialog" v-show="isShowDialog">
+        <div v-show="isShowBrief" id="briefContent" class="brief-content">
+          <div class="brief-title lt-znd2I9">
+            <a class="title"  target="_blank" rel="noreferrer">
+              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" fill="none" class="user-avatar"><defs><path id="bot_svg__a" d="M0 0h30v30H0z"></path><path id="bot_svg__c" d="M0 0h20.455v20.455H0z"></path></defs><g><rect fill="#E7F8FF" width="30" height="30" rx="10"></rect><mask id="bot_svg__b" fill="#fff"><use xlink:href="#bot_svg__a"></use></mask><g mask="url(#bot_svg__b)"><g transform="translate(4.773 4.773)"><mask id="bot_svg__d" fill="#fff"><use xlink:href="#bot_svg__c"></use></mask><g mask="url(#bot_svg__d)"><path fill-rule="evenodd" d="M19.11 8.37c.17-.52.26-1.06.26-1.61 0-.9-.24-1.79-.71-2.57a5.24 5.24 0 0 0-4.53-2.59c-.37 0-.73.04-1.09.11A5.201 5.201 0 0 0 9.17 0h-.04C6.86 0 4.86 1.44 4.16 3.57A5.11 5.11 0 0 0 .71 6.04C.24 6.83 0 7.72 0 8.63c0 1.27.48 2.51 1.35 3.45-.18.52-.27 1.07-.27 1.61 0 .91.25 1.8.71 2.58 1.13 1.94 3.41 2.94 5.63 2.47a5.18 5.18 0 0 0 3.86 1.71h.05c2.26 0 4.27-1.44 4.97-3.57a5.132 5.132 0 0 0 3.45-2.47c.46-.78.7-1.67.7-2.58 0-1.28-.48-2.51-1.34-3.46ZM8.947 18.158c-.04.03-.08.05-.12.07.7.58 1.57.89 2.48.89h.01c2.14 0 3.88-1.72 3.88-3.83v-4.76c0-.02-.02-.04-.04-.05l-1.74-.99v5.75c0 .23-.13.45-.34.57l-4.13 2.35Zm-.67-1.153 4.17-2.38c.02-.01.03-.03.03-.05v-1.99l-5.04 2.87c-.21.12-.47.12-.68 0l-4.13-2.35c-.04-.02-.09-.06-.12-.07-.04.21-.06.43-.06.65 0 .67.18 1.33.52 1.92v-.01c.7 1.19 1.98 1.92 3.37 1.92.68 0 1.35-.18 1.94-.51ZM3.903 5.168v-.14c-.85.31-1.57.9-2.02 1.68a3.78 3.78 0 0 0-.52 1.91c0 1.37.74 2.64 1.94 3.33l4.17 2.37c.02.01.04.01.06 0l1.75-1-5.04-2.87a.64.64 0 0 1-.34-.57v-4.71Zm13.253 3.337-4.18-2.38c-.02 0-.04 0-.06.01l-1.74.99 5.04 2.87c.21.12.34.34.34.58v4.85c1.52-.56 2.54-1.99 2.54-3.6 0-1.37-.74-2.63-1.94-3.32ZM8.014 5.83c-.02.01-.03.03-.03.05v1.99L13.024 5a.692.692 0 0 1 .68 0l4.13 2.35c.04.02.08.05.12.07.03-.21.05-.43.05-.65 0-2.11-1.74-3.83-3.88-3.83-.68 0-1.35.18-1.94.51l-4.17 2.38Zm1.133-4.492c-2.15 0-3.89 1.72-3.89 3.83v4.76c0 .02.02.03.03.04l1.75 1v-5.75c0-.23.13-.45.34-.57l4.13-2.35c.04-.03.09-.06.12-.07-.7-.58-1.58-.89-2.48-.89ZM7.983 11.51l2.24 1.27 2.25-1.27V8.95l-2.25-1.28-2.24 1.28v2.56Z" style="fill: rgb(31, 148, 140);"></path></g></g></g></g></svg>
+            </a>
+          </div>
+          <div class="action-bar-lite-window-vuGdUx action-bar-SA76od" style="opacity: 1;">
+            <div class="box-NzPGeV">
+              <span @click="handleClick('translate')" id="translate" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
+                <span class="text-wrapper-92ojRl" data-text="翻译">
+                  <span class="text-0Pw8ng">翻译</span>
+                </span>
+              </span>
+              <span @click="handleClick('summary')" id="quickSummary" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
+                <span class="text-wrapper-92ojRl" data-text="总结">
+                  <span class="text-0Pw8ng">总结</span>
+                </span>
+              </span>
+            </div>
+          </div>
+          <el-dropdown id="selectTextDropDown" @command="handleClickDropDown">
+            <span class="el-dropdown-link">
+              <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
-          </span>
-          <span id="quickSummary" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
-            <span class="text-wrapper-92ojRl" data-text="总结">
-              <span class="text-0Pw8ng">总结</span>
-            </span>
-          </span>
-      </div>
-    `;
-    dialogBox.appendChild(briefContent);
-    const complateContent = document.createElement('div');
-    complateContent.id = 'complateContent';
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="translate">翻译</el-dropdown-item>
+              <el-dropdown-item command="summary">总结</el-dropdown-item>
+              <el-dropdown-item command="explain">解释</el-dropdown-item>
+              <el-dropdown-item command="explainCode">解释代码</el-dropdown-item>
+              <el-dropdown-item command="grammar">语法</el-dropdown-item>
+              <el-dropdown-item command="rewrite">重写</el-dropdown-item>
+              <el-dropdown-item command="qa">问答</el-dropdown-item>
+              <el-dropdown-item command="expansion">扩写</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
 
-    complateContent.innerHTML = `
-      <div id="dialogBoxSelectBox">
-        <h5 id="dialogBoxSelectTitle">选中文本<h5/>
-        <textarea class="text-area" id="selectVal"></textarea>
-      <div>
-      <div id="selectActions">
-        <div class="action-bar-lite-window-vuGdUx action-bar-SA76od" style="opacity: 1;">
-          <div class="box-NzPGeV">
-            <div id="summary" data-id="751061" class="tag-button" style="opacity: 1; pointer-events: auto;">
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M10.5 10.5h6M10.5 13.5h6M19.5 3.75h-15a.75.75 0 0 0-.75.75v15c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75v-15a.75.75 0 0 0-.75-.75ZM7.5 3.75v16.5" data-follow-stroke="#000"></path></g></svg>
-              <div class="text-wrapper-92ojRl" data-text="总结"><div class="text-0Pw8ng">摘要</div></div></div>
-            <span id="grammar" data-id="1924664" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 32 32" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="m27 26-5-10-5 10M18.428 23.143h7.143M5 18h9M5 23h9M5.006 8h21M5.006 13h21" data-follow-stroke="#000"></path></g></svg>
-              <span class="text-wrapper-92ojRl" data-text="语法"><span class="text-0Pw8ng">语法</span></span></span>
-            <span id="explainCode" data-id="1924663" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path fill="currentColor" d="M7.8 19.2H7A1.2 1.2 0 0 1 5.8 18v-4.1a1.8 1.8 0 0 0-1.236-1.71L3.987 12l.577-.19A1.8 1.8 0 0 0 5.8 10.1V6A1.2 1.2 0 0 1 7 4.8h.8V3.2H7A2.8 2.8 0 0 0 4.2 6v3.7a1.7 1.7 0 0 1-1.7 1.7h-.3v1.2h.3a1.7 1.7 0 0 1 1.7 1.7V18A2.8 2.8 0 0 0 7 20.8h.8v-1.6ZM16.2 19.2h.8a1.2 1.2 0 0 0 1.2-1.2v-4.1a1.8 1.8 0 0 1 1.236-1.71l.577-.19-.577-.19A1.8 1.8 0 0 1 18.2 10.1V6A1.2 1.2 0 0 0 17 4.8h-.8V3.2h.8A2.8 2.8 0 0 1 19.8 6v3.7a1.701 1.701 0 0 0 1.7 1.7h.3v1.2h-.3a1.7 1.7 0 0 0-1.7 1.7V18a2.8 2.8 0 0 1-2.8 2.8h-.8v-1.6Z" clip-rule="evenodd" fill-rule="evenodd" data-follow-fill="#09121F"></path></g></svg>
-              <span class="text-wrapper-92ojRl" data-text="解释代码"><span class="text-0Pw8ng">解释代码</span></span></span>
-            <span id="rewrite" data-id="1924662" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M12.75 6 18 11.25M20.25 20.25H9l-5.202-5.202" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M9 20.25H4.5a.75.75 0 0 1-.75-.75v-4.19a.75.75 0 0 1 .22-.53L15.22 3.53a.75.75 0 0 1 1.06 0l4.19 4.19a.75.75 0 0 1 0 1.06L9 20.25Z" data-follow-stroke="#000"></path></g></svg>
-              <span class="text-wrapper-92ojRl" data-text="重写"><span class="text-0Pw8ng">重写</span></span></span>
-            <span id="explain" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
-              <span class="text-wrapper-92ojRl" data-text="解释"><span class="text-0Pw8ng">解释</span></span></span>
-            <span id="translate" data-id="751060" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M21.75 20.25 16.5 9.75l-5.25 10.5M12.75 17.25h7.5M8.25 3v2.25M2.25 5.25h12M11.25 5.25a9 9 0 0 1-9 9" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M5.763 8.25a9.004 9.004 0 0 0 8.486 5.997" data-follow-stroke="#000"></path></g></svg>
-              <span class="text-wrapper-92ojRl" data-text="翻译"><span class="text-0Pw8ng">翻译</span></span></span>
-            <span id="qa" data-id="1924661" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M20.95 11.625a8.625 8.625 0 0 1-8.625 8.625H3.7v-8.625a8.625 8.625 0 0 1 17.25 0Z" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M12.325 13.62v-1.725a2.587 2.587 0 1 0-2.588-2.588" data-follow-stroke="#000"></path><path fill="currentColor" d="M12.325 17.501a1.078 1.078 0 1 0 0-2.156 1.078 1.078 0 0 0 0 2.156Z" clip-rule="evenodd" fill-rule="evenodd" data-follow-fill="#000"></path></g></svg>
-              <span class="text-wrapper-92ojRl" data-text="问答"><span class="text-0Pw8ng">问答</span></span></span>
-            <span id="expansion" data-id="1924660" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="#637381" d="M10 3h3v3m-3.5.5L13 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="#37404A" d="M6 13H3v-3m3.5-.5L3 13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>
-              <span class="text-wrapper-92ojRl" data-text="扩写"><span class="text-0Pw8ng">扩写</span></span></span></div>
+        <div v-show="isShowComplete" id="complateContent">
+          <div id="dialogBoxSelectBox">
+            <h5 id="dialogBoxSelectTitle">选中文本<h5/>
+            <el-input
+              id="selectVal"
+              class="text-area" 
+              type="textarea"
+              :autosize="{ minRows: 2 }"
+              placeholder="请输入内容"
+              v-model="selectVal">
+            </el-input>
+          <div>
+          <div id="selectActions">
+            <div class="action-bar-lite-window-vuGdUx action-bar-SA76od" style="opacity: 1;">
+              <div class="box-NzPGeV">
+                <div @click="handleClick('summary')" id="summary" data-id="751061" class="tag-button" style="opacity: 1; pointer-events: auto;">
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M10.5 10.5h6M10.5 13.5h6M19.5 3.75h-15a.75.75 0 0 0-.75.75v15c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75v-15a.75.75 0 0 0-.75-.75ZM7.5 3.75v16.5" data-follow-stroke="#000"></path></g></svg>
+                  <div class="text-wrapper-92ojRl" data-text="总结"><div class="text-0Pw8ng">摘要</div></div></div>
+                <span @click="handleClick('grammar')"  id="grammar" data-id="1924664" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 32 32" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="m27 26-5-10-5 10M18.428 23.143h7.143M5 18h9M5 23h9M5.006 8h21M5.006 13h21" data-follow-stroke="#000"></path></g></svg>
+                  <span class="text-wrapper-92ojRl" data-text="语法"><span class="text-0Pw8ng">语法</span></span></span>
+                <span @click="handleClick('explainCode')" id="explainCode" data-id="1924663" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path fill="currentColor" d="M7.8 19.2H7A1.2 1.2 0 0 1 5.8 18v-4.1a1.8 1.8 0 0 0-1.236-1.71L3.987 12l.577-.19A1.8 1.8 0 0 0 5.8 10.1V6A1.2 1.2 0 0 1 7 4.8h.8V3.2H7A2.8 2.8 0 0 0 4.2 6v3.7a1.7 1.7 0 0 1-1.7 1.7h-.3v1.2h.3a1.7 1.7 0 0 1 1.7 1.7V18A2.8 2.8 0 0 0 7 20.8h.8v-1.6ZM16.2 19.2h.8a1.2 1.2 0 0 0 1.2-1.2v-4.1a1.8 1.8 0 0 1 1.236-1.71l.577-.19-.577-.19A1.8 1.8 0 0 1 18.2 10.1V6A1.2 1.2 0 0 0 17 4.8h-.8V3.2h.8A2.8 2.8 0 0 1 19.8 6v3.7a1.701 1.701 0 0 0 1.7 1.7h.3v1.2h-.3a1.7 1.7 0 0 0-1.7 1.7V18a2.8 2.8 0 0 1-2.8 2.8h-.8v-1.6Z" clip-rule="evenodd" fill-rule="evenodd" data-follow-fill="#09121F"></path></g></svg>
+                  <span class="text-wrapper-92ojRl" data-text="解释代码"><span class="text-0Pw8ng">解释代码</span></span></span>
+                <span @click="handleClick('rewrite')" id="rewrite" data-id="1924662" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M12.75 6 18 11.25M20.25 20.25H9l-5.202-5.202" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M9 20.25H4.5a.75.75 0 0 1-.75-.75v-4.19a.75.75 0 0 1 .22-.53L15.22 3.53a.75.75 0 0 1 1.06 0l4.19 4.19a.75.75 0 0 1 0 1.06L9 20.25Z" data-follow-stroke="#000"></path></g></svg>
+                  <span class="text-wrapper-92ojRl" data-text="重写"><span class="text-0Pw8ng">重写</span></span></span>
+                <span @click="handleClick('explain')" id="explain" data-id="751059" class="tag-button tag-button-active-y5uMAc" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M16.5 3v9l-3-2.25-3 2.25V3M4.5 20.25V21H18" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M4.5 20.25A2.25 2.25 0 0 1 6.75 18H19.5V3H6.75A2.25 2.25 0 0 0 4.5 5.25v15Z" data-follow-stroke="#000"></path></g></svg>
+                  <span class="text-wrapper-92ojRl" data-text="解释"><span class="text-0Pw8ng">解释</span></span></span>
+                <span @click="handleClick('translate')" id="translate" data-id="751060" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M21.75 20.25 16.5 9.75l-5.25 10.5M12.75 17.25h7.5M8.25 3v2.25M2.25 5.25h12M11.25 5.25a9 9 0 0 1-9 9" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M5.763 8.25a9.004 9.004 0 0 0 8.486 5.997" data-follow-stroke="#000"></path></g></svg>
+                  <span class="text-wrapper-92ojRl" data-text="翻译"><span class="text-0Pw8ng">翻译</span></span></span>
+                <span @click="handleClick('qa')"  id="qa" data-id="1924661" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="min-width: 16px; min-height: 16px;"><g><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M20.95 11.625a8.625 8.625 0 0 1-8.625 8.625H3.7v-8.625a8.625 8.625 0 0 1 17.25 0Z" data-follow-stroke="#000"></path><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="currentColor" d="M12.325 13.62v-1.725a2.587 2.587 0 1 0-2.588-2.588" data-follow-stroke="#000"></path><path fill="currentColor" d="M12.325 17.501a1.078 1.078 0 1 0 0-2.156 1.078 1.078 0 0 0 0 2.156Z" clip-rule="evenodd" fill-rule="evenodd" data-follow-fill="#000"></path></g></svg>
+                  <span class="text-wrapper-92ojRl" data-text="问答"><span class="text-0Pw8ng">问答</span></span></span>
+                <span @click="handleClick('expansion')" id="expansion" data-id="1924660" class="tag-button" style="opacity: 1; pointer-events: auto;"><svg width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="#637381" d="M10 3h3v3m-3.5.5L13 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="#37404A" d="M6 13H3v-3m3.5-.5L3 13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>
+                  <span class="text-wrapper-92ojRl" data-text="扩写"><span class="text-0Pw8ng">扩写</span></span></span></div>
+            </div>
+          </div>
+          <div>
+            <h5 id="dialogBoxResultTitle">结果<h5/>
+            <el-input
+              class="text-area" 
+              id="selectResult"
+              type="textarea"
+              :autosize="{ minRows: 2 }"
+              placeholder="请输入内容"
+              v-model="result">
+            </el-input>
+          <div>
+          <div class="monica-btn btn continue-chat primary-outline-button" id="chatBtn">
+            <svg aria-hidden="true" focusable="false" role="img" class="octicon octicon-comment" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" style="display: inline-block; user-select: none; vertical-align: text-bottom; overflow: visible;"><path d="M1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0 1 13.25 12H9.06l-2.573 2.573A1.458 1.458 0 0 1 4 13.543V12H2.75A1.75 1.75 0 0 1 1 10.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h4.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+            </svg>
+            <span class="text">在聊天中继续</span>
+          </div>
         </div>
       </div>
-      <div>
-        <h5 id="dialogBoxResultTitle">结果<h5/>
-        <textarea class="text-area" id="selectResult"></textarea>
-      <div>
-    `;
+    `
     GM_addStyle(`
+      #floatDialog {
+        position: absolute;
+        background-color: white;
+        padding: 10px;
+        z-index: 999;
+        display: block;
+        border-radius: 8px;
+        border: 1px solid #dadce0;
+      }
+      #briefContent {
+        align-items: center;
+        display: flex;
+      }
+      #briefContent .brief-title {
+        margin-right: 10px;
+      }
+      #complateContent {
+        display: flex;
+      }
       #complateContent .brief-title {
         margin-right: 10px;
       }
       #complateContent .text-area {
         width: 99%;
+        margin-bottom: 10px;
       }
       #selectActions {
         margin-top: 10px;
@@ -1203,7 +1235,7 @@
           align-content: flex-start;
           justify-content: right;
       }
-      #complateContent .tag-button {
+      #floatDialog .tag-button  {
           position: relative;
           cursor: pointer;
           user-select: none;
@@ -1222,186 +1254,29 @@
           max-width: 150px;
           background: #fff;
       }
-      #complateContent .tag-button .text-wrapper-92ojRl {
+      #floatDialog .tag-button .text-wrapper-92ojRl {
           flex: 1;
           min-width: 0px;
           display: flex;
           flex-direction: column;
       }
-      #complateContent .tag-button .text-wrapper-92ojRl {
+      #floatDialog .tag-button .text-wrapper-92ojRl {
           flex: 1;
           min-width: 0px;
           display: flex;
           flex-direction: column;
       }
-      #complateContent .tag-button:hover {
+      #floatDialog .tag-button:hover {
           background: rgba(235,202,254,.24);
           text-decoration: none!important;
       }
     `);
-    dialogBox.appendChild(complateContent);
+    // dialogBox.appendChild(complateContent);
     document.body.appendChild(dialogBox);
-    creatChatBtn(complateContent);
-    $('#briefContent').addEventListener('click', () => {
-      $('#briefContent').style.display = 'none';
-      complateContent.style.display = 'block';
-    });
-    addClickAndPostMsg({
-      targetId: 'summary',
-      clickFn: () => {
-        postMsg({
-          type: 'selectText',
-          content: `给一个二年级的学生总结一下：${$('#selectVal').value}`,
-        });
-      },
-      resultId: 'selectResult',
-    });
-    addClickAndPostMsg({
-      targetId: 'quickSummary',
-      clickFn: () => {
-        postMsg({
-          type: 'selectText',
-          content: `给一个二年级的学生总结一下：${$('#selectVal').value}`,
-        });
-      },
-      resultId: 'selectResult',
-    });
-    addClickAndPostMsg({
-      targetId: 'grammar',
-      clickFn: () => {
-        postMsg({
-          type: 'selectText',
-          content: `校对并纠正这段文字：${$('#selectVal').value}`,
-        });
-      },
-      resultId: 'selectResult',
-    });
-    addClickAndPostMsg({
-      targetId: 'explainCode',
-      clickFn: () => {
-        postMsg({
-          type: 'selectText',
-          content: '解释以下代码：```' + $('#selectVal').value + '```',
-        });
-      },
-      resultId: 'selectResult',
-    });
-    addClickAndPostMsg({
-      targetId: 'rewrite',
-      clickFn: () => {
-        postMsg({
-          type: 'selectText',
-          content: `重新表述这段文字：${$('#selectVal').value}`,
-        });
-      },
-      resultId: 'selectResult',
-    });
-    addClickAndPostMsg({
-      targetId: 'explain',
-      clickFn: () => {
-        postMsg({
-          type: 'selectText',
-          content: `解释${
-            $('#selectVal').value
-          }, 并说明其中使用的任何技术术语。`,
-        });
-      },
-      resultId: 'selectResult',
-    });
-    addClickAndPostMsg({
-      targetId: 'translate',
-      clickFn: () => {
-        postMsg({
-          type: 'selectText',
-          content: `给出以下文字的中文以及英文翻译：${$('#selectVal').value}。`,
-        });
-      },
-      resultId: 'selectResult',
-    });
-    addClickAndPostMsg({
-      targetId: 'quickTranslate',
-      clickFn: () => {
-        postMsg({
-          type: 'selectText',
-          content: `给出以下文字的中文以及英文翻译：${$('#selectVal').value}。`,
-        });
-      },
-      resultId: 'selectResult',
-    });
-    addClickAndPostMsg({
-      targetId: 'qa',
-      clickFn: () => {
-        postMsg({
-          type: 'selectText',
-          content: `回答这个问题：${$('#selectVal').value}`,
-        });
-      },
-      resultId: 'selectResult',
-    });
-    addClickAndPostMsg({
-      targetId: 'expansion',
-      clickFn: () => {
-        postMsg({
-          type: 'selectText',
-          content: `详细说明这段文字：${$('#selectVal').value}`,
-        });
-      },
-      resultId: 'selectResult',
-    });
+    // creatChatBtn(complateContent);
 
     return dialogBox;
   }
-
-  const isInDialogBox = () => {
-    const element = $('#floatDialog'); // 获取需要检查的元素
-    const rect = element.getBoundingClientRect(); // 获取元素位置和尺寸信息
-    const x = event.clientX; // 获取鼠标点击的X坐标
-    const y = event.clientY; // 获取鼠标点击的Y坐标
-    let selectedElement = document.getSelection()?.focusNode?.parentNode;
-    // console.log('选中的元素是：', document.getSelection(), selectedElement, {
-    //   rect,
-    //   x,
-    //   y,
-    // });
-
-    // 判断鼠标点击的坐标是否在元素位置之内
-    if (
-      x >= rect.left &&
-      x <= rect.right &&
-      y >= rect.top &&
-      y <= rect.bottom
-    ) {
-      // console.log('点击的位置处于该元素之中！');
-    } else {
-      // console.log('点击的位置不在该元素之中。');
-    }
-    return (
-      x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
-    );
-  };
-
-  const handleSelect = () => {
-    let selectionText = document.addEventListener('mouseup', function () {
-      selectionText = window.getSelection().toString();
-      if (selectionText && !isInDialogBox()) {
-        // 如果选中的是文本，而不是DOM元素
-        console.log('选中了文本：', selectionText, $('#floatDialog'));
-        $('#selectVal').value = selectionText;
-        dialogBox.style.display = 'block';
-        $('#briefContent').style.display = 'flex';
-        $('#complateContent').style.display = 'none';
-        setDialogBoxPos();
-      } else {
-        let selectedElement = document.getSelection()?.focusNode?.parentNode;
-        const classList = selectedElement?.classList?.value
-        console.log(`点击元素: ${selectedElement}, '类名为：${classList}, id为：${selectedElement?.id}`)
-        if(classList && !classList.includes('chat') && !classList.includes('tab-item-badge')) {
-          // postMsg({type: 'clickElement', content: classList})
-        }
-        !isInDialogBox() && (dialogBox.style.display = 'none');
-      }
-    });
-  };
 
   // 主函数
   var main = function () {
@@ -1413,37 +1288,33 @@
     // 处理监听ChatGPT-web的消息
     handlePostMessage();
 
-    // 处理选中文本
-    handleSelect();
-
-    createDialogBox();
-    handleTextAutoHeight();
-
     vm = new Vue({
       el: '#customization-chat-room',
       data: {
         activeName: 'chatgpt',
         localCode: [],
         isGetNew: false,
-        activeCollapse: [1],
+        activeCollapse: [3],
         logs: [
           {
-            title: '版本 1.2.0',
-            id: 1,
+            title: '版本 1.2.2',
+            id: 3,
             content: [
               '1. 支持流式输出，响应更快啦！',
+              '2. 支持选中文本快捷操作',
+              '3. 增加请求频率控制',
             ]
           },
           {
             title: '版本 1.1.7',
-            id: 1,
+            id: 2,
             content: [
               '1. 支持 Midjourney 出图，聊天框输入/mj即可体验，（如/mj iron man）'
             ]
           },
           {
             title: '版本 1.1.6',
-            id: 2,
+            id: 1,
             content: [
               '1. 支持百度、谷歌搜索增强',
               '2. 支持选中文本总结、翻译、扩写、代码解释、解释、语法、问答',
@@ -1551,6 +1422,140 @@
           }
         },
       },
+    });
+
+    // 选中文本的弹出框
+    createDialogBox();
+    handleTextAutoHeight();
+    dialogVm = new Vue({
+      el: '#floatDialog',
+      data: {
+        dialogBox: $('#floatDialog'),
+        isShowDialog: false,
+        isShowBrief: true,
+        isShowComplete: false,
+        result: '',
+        mapDict: {
+          summary: '给一个二年级的学生总结一下',
+          explain: '解释{your content here},并说明其中使用的任何技术术语',
+          grammar: '校对并纠正这段文字',
+          explainCode: '解释以下代码',
+          rewrite: '重新表述这段文字',
+          translate: '给出以下文字的中文以及英文翻译',
+          qa: '回答这个问题',
+          expansion: '详细说明这段文字'
+        },
+        selectVal: ''
+      },
+      mounted() {
+        console.log('mou', $('#floatDialog'))
+        // 处理选中文本
+        this.handleSelect();
+        $('#briefContent').addEventListener('click', () => {
+          // $('#briefContent').style.display = 'none';
+          // complateContent.style.display = 'block';
+          this.isShowBrief = false;
+          this.isShowComplete = true;
+          console.log('www')
+        });
+        this.registerClick();
+      },
+      beforeUnmount() {},
+      methods: {
+        handleClickDropDown(type) {
+          console.log('handleClickDropDown', type)
+          this.handleClick(type)
+          this.isShowComplete = true;
+          this.isShowBrief = false;
+        },
+        handleClick(type) {
+          this.result = '加载中...';
+          postMsg({
+            type: 'selectText',
+            content: `${this.mapDict[type]}: ${this.selectVal}`,
+          });
+        },
+        addClickAndPostMsg({ targetId, type, content, resultId, clickFn }) {
+          $(`#${targetId}`).addEventListener('click', () => {
+            postMsg({ type, content });
+            $(`#${resultId}`).value = '加载中...';
+            clickFn && clickFn();
+          });
+        },
+        registerClick() {
+          $('#chatBtn').addEventListener('click', () => {
+            $('#customization-drawer').style.right = 0;
+          });
+        },
+        isInDialogBox() {
+          const element = $('#floatDialog'); // 获取需要检查的元素
+          const rect = element.getBoundingClientRect(); // 获取元素位置和尺寸信息
+          const x = event.clientX; // 获取鼠标点击的X坐标
+          const y = event.clientY; // 获取鼠标点击的Y坐标
+          let selectedElement = document.getSelection()?.focusNode?.parentNode;
+          // console.log('选中的元素是：', document.getSelection(), selectedElement, {
+          //   rect,
+          //   x,
+          //   y,
+          // });
+
+          // 判断鼠标点击的坐标是否在元素位置之内
+          if (
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom
+          ) {
+            // console.log('点击的位置处于该元素之中！');
+          } else {
+            // console.log('点击的位置不在该元素之中。');
+          }
+          return (
+            x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+          );
+        },
+        setDialogBoxPos() {
+          let sel = window.getSelection();
+          let range = sel.getRangeAt(0);
+          let rect = range.getBoundingClientRect();
+
+          $('#floatDialog').style.top = rect.bottom + window.pageYOffset + 'px';
+          $('#floatDialog').style.left =
+            (rect.left + rect.right) / 2 + window.pageXOffset + 'px';
+            console.log('setDialogBoxPos', $('#floatDialog').style.left, $('#floatDialog').style.top)
+        },
+        handleSelect() {
+          const that = this;
+          let selectionText = document.addEventListener('mouseup', (e) => {
+            selectionText = window.getSelection().toString();
+            console.log('3', e)
+            if (selectionText && !that.isInDialogBox()) {
+              // 如果选中的是文本，而不是DOM元素
+              console.log('选中了文本：', selectionText, $('#floatDialog'));
+              // $('#selectVal').value = selectionText;
+              that.selectVal = selectionText;
+              // $('#floatDialog').style.display = 'block';
+              that.isShowDialog = true;
+              that.isShowBrief = true;
+              that.isShowComplete = false;
+              // $('#briefContent').style.display = 'flex';
+              // $('#complateContent').style.display = 'none';
+              that.setDialogBoxPos();
+            } else {
+              let selectedElement = document.getSelection()?.focusNode?.parentNode;
+              const classList = selectedElement?.classList?.value
+              console.log(`点击元素: ${selectedElement}, '类名为：${classList}, id为：${selectedElement?.id}`)
+              if(classList && !classList.includes('chat') && !classList.includes('tab-item-badge')) {
+                // postMsg({type: 'clickElement', content: classList})
+              }
+              if(!that.isInDialogBox() && classList !== 'el-dropdown-menu__item') {
+                // ($('#floatDialog').style.display = 'none');
+                that.isShowDialog = false;
+              } 
+            }
+          });
+        },
+      }
     });
 
     const iframe = $('#chatgpt-iframe');
