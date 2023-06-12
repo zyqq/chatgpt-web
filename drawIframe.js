@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           网页定制（ChatGPT版）
 // @namespace      http://tampermonkey.net/
-// @version        v1.1.7
+// @version        v1.2.0
 // @author         yiqiuzheng
 // @description    ChatGPT助手，支持搜索增强、选中文本拓展、总结文章以及定制网页！网页版地址：https://chatgpt-echo.zeabur.app/ ，可关注微信公众号秋博士，获取ChatGPT访问密码
 // @icon           data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAH1UExURUxpcXeqn3WqnHWonHSpnHWonHWpnG22knWpnHWpnHSmm3apm3SpnHWonHWpnHSonHWpnHWpm3apnXWpnHWpm3WpnP///8fc19fm43mrn67Nxf7///r8+6HFvNPk4JS8ssXb1XirnsDY0sPa1Pj7+qbHv5i/tXeqnvz9/X6uoo65roq2q+Tu7P3+/qrKwqDEu9bm4vP39qfIwPv9/NXl4ezz8Xqsn+nx73msn5/Dusnd2N7q59zp5pC6r4CwpKLFvIOxpszf2oSypsTa1fn7+/P49t/r6JrAt8LZ1L/X0d3q53aqnczf287h3Ie0qc7g3Pr8/LTQybDOxpvBuObv7c/h3PX5+Ory8ODr6OPt65G7sLnTzYWzp/n7+oi1qv7+/tTk4J7Cucve2Z3Cub7X0H+vo8LZ053CuKnJwff6+tnn4/3+/fD29XytoYWzqJe+tJa+tHapnHeqnaHEu8vf2oGxpazLw3utoMre2ZW9s7XRyu/19H2uou/186XHv6jJwNDi3sjd2OLt6u308ufw7tfm4rjTzK3MxOjw7tvp5dHi3sjd15m/tvL39q/Nxvb5+OPu64y3rIOyptnn5LbSy+Ds6eHs6tbl4cHZ0/v8/H6vo4GwpZ7Dus/h3fb6+ZK7sfT49/f6+aLFvavLw6zLxM3g28bc1pQLf2QAAAAVdFJOUwAtv5bz1PQH/dUuj5WQ/CyYwJHykqKEGP8AAAAJcEhZcwAAAHYAAAB2AU57JggAAAIcSURBVDjLhdNle9swEABgFdK0Kw7uHMfp6iTeAksaThpoUmZuV1x5zMxbx8wM7Xj7nZNjx/L2rNl9kXR6H51snwmhsWFTWQn8FSWGygKihLGmFP4ZpUXG7P5GWDcKZVEDeaKC1mfnHxUvoSV19YQOVFWTLdpiUfJ2POx/jOEzAy4tWU7KctPG95FpOjT0IA2PT80aSHEOpKQ5mSUxIA7bD2OzI5vdTNTt1QXBDvAxMT/7qkE+h8PdyoYC+DX0YgYyX4W+FwBunqYOhpp0YAl/1eN22Or5DPD8Jd6sBTiOZgYa8SfUysAMH+wWW/AK3ndbUWRADKUVMGIex1YrRGcs3uvYxcCzKVCAJTb66FZsFGDXTgHPMjD2WgWcFeCkHd/uoOshj0MD16QoLOI2+Q406ifpPXh4gisaOIXD4JiZXUoqwARx/Ab80zB7TJMzmK17nr4BK2eCOnocJGMMBBH9tO6FqYhveUJSwZsxBrpRDDltl6G3G7/8+K6AtLOZARu65hYwcLfL8s4l30EGCTzGwH6MA3Tew9u0Tp1HBmYOT+u+xZ62nl4AB91uGRQ+ZWAZ53HQqgMwgn3n6BC90+bl0nLJB51qH+QaphUD3EWuHVNuuhiQwlrPaS3n6zhEW+2G3I3TkSE3A5XalG860o/j/sSkcGAf62tS8MdvFfe3Oyf2tugyhBRB3qC/XuF/ADFWVOUHhFSXG4rXA78BYbiLJDUXqsMAAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII=
@@ -11,6 +11,7 @@
 // @run-at         document-end
 // @require        https://cdn.staticfile.org/vue/2.7.0/vue.min.js
 // @require        https://unpkg.com/element-ui/lib/index.js
+// @require        https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js
 // @grant          GM_log
 // @grant          GM_notification
 // @grant          unsafeWindow
@@ -33,12 +34,15 @@
   const $ = (selector) => {
     return document.querySelector(selector);
   };
-  const linkEl = document.createElement('link');
-  linkEl.rel = 'stylesheet';
-  linkEl.href =
-    'https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css';
 
-  $('head').insertBefore(linkEl, $('head').firstChild);
+  const genLink = (url) => {
+    const linkEl = document.createElement('link');
+    linkEl.rel = 'stylesheet';
+    linkEl.href = url;
+    $('head').insertBefore(linkEl, $('head').firstChild);
+  }
+  genLink('https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css')
+  genLink('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.css">')
 
   // 聊天按钮样式
   GM_addStyle(`
@@ -146,20 +150,10 @@
     }
   `);
 
-  //公共效果
-  GM_addStyle(`
-      #app{
-        min-width:539px;
-        right: 20px;
-        top: 100px;
-        z-index: 9999;
-      }
-    `);
-
   let vm = null;
 
   // 本地调试ChatGPT的iframe
-  //const domain = 'http://localhost:3000/#/';
+  // const domain = 'http://localhost:3000/#/';
   // 线上ChatGPT的iframe地址
   const domain = 'https://chatgpt-echo.zeabur.app/';
 
@@ -489,22 +483,22 @@
         height: inherit;
         background: #e7f8ff;
       }
-      .el-tabs__active-bar {
+      #customization-chat-room .el-tabs__active-bar {
         width: 58px!important;
       }
 
-      .el-tabs__content {
+      #customization-chat-room .el-tabs__content {
         height: inherit;
         box-sizing: border-box;
         overflow: auto;
       }
 
-      .el-tab-pane {
+      #customization-chat-room .el-tab-pane {
         height: inherit;
         box-sizing: border-box;
         width: 100%;
       }
-      .el-tabs__header {
+      #customization-chat-room .el-tabs__header {
         margin: 0 0 10px;
         padding: 0 10px;
       }
@@ -512,24 +506,24 @@
         width: 100%;
         height: inherit;
       }
-      .el-collapse-item__header {
+      #customization-chat-room .el-collapse-item__header {
         padding: 0 10px;
       }
-      .el-collapse-item__wrap {
+      #customization-chat-room .el-collapse-item__wrap {
         padding: 0 10px;
       }
-      .tab-item-badge .el-badge__content.is-fixed {
+      #customization-chat-room .tab-item-badge .el-badge__content.is-fixed {
         top: 5px;
       }
     `);
 
     // 美化页面
     GM_addStyle(`
-            .tab-item {
+            #customization-chat-room .tab-item {
               padding: 10px;
               height: 100%;
             }
-            .match-item {
+            #customization-chat-room .match-item {
               width: 100%;
             }
             #customization-chat-room {
@@ -606,39 +600,6 @@
                 bottom: -10px;
             }
         `);
-  };
-
-  // 添加保存图标的函数
-  var addSaveIcon = function (element) {
-    var iconWrapper = document.createElement('span');
-    iconWrapper.className = 'customization-save-icon-wrapper';
-    iconWrapper.innerHTML = '💾';
-    element.appendChild(iconWrapper);
-    iconWrapper.addEventListener('click', function (event) {
-      event.stopPropagation();
-      var messageBubble = this.parentNode.querySelector(
-        '.customization-message-bubble'
-      );
-      var config = getConfig();
-      config.customization.push(messageBubble.textContent);
-      saveConfig(config);
-      // 提示保存成功
-      var successMessage = document.createElement('div');
-      successMessage.innerHTML = '保存成功';
-      successMessage.style.position = 'fixed';
-      successMessage.style.top = '50%';
-      successMessage.style.left = '50%';
-      successMessage.style.transform = 'translate(-50%, -50%)';
-      successMessage.style.backgroundColor = '#fff';
-      successMessage.style.border = '2px solid #ddd';
-      successMessage.style.padding = '10px';
-      document.body.appendChild(successMessage);
-
-      // 3 秒后移除提示信息
-      setTimeout(function () {
-        document.body.removeChild(successMessage);
-      }, 3000);
-    });
   };
 
   const evalCode = (content) => {
@@ -776,7 +737,7 @@
           </div>
           <div id="header-right" class="header-right">
             <div id="toolbar" class="toolbar">
-               <el-tooltip class="item" effect="dark" content="Top Left 提示文字" placement="top-start">
+              <el-tooltip class="item" effect="dark" content="Top Left 提示文字" placement="top-start">
                 <span title="复制" class="toolbar-item-EhZYV5">
                   <svg id="copy" width="16" height="16" fill="none" viewBox="0 0 16 16" style="min-width: 16px; min-height: 16px;"><g><path data-follow-stroke="currentColor" d="M4.334 4.145v-1.54c0-.517.42-.937.937-.937h8.125c.518 0 .938.42.938.937v8.125c0 .518-.42.938-.938.938H11.84" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path data-follow-stroke="currentColor" d="M10.729 4.332H2.604a.937.937 0 0 0-.938.938v8.125c0 .517.42.937.938.937h8.125c.517 0 .937-.42.937-.938V5.27a.937.937 0 0 0-.938-.938Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"></path></g>
                   </svg>
@@ -796,6 +757,7 @@
         border-radius: 8px;
         border: 1px solid #dadce0;
         padding: 0 16px;
+        overflow: auto;
       }
       .chatgpt-search-enhance .header-7QHGYk {
           height: 56px;
@@ -828,7 +790,7 @@
       .chatgpt-search-enhance .header-7QHGYk .header-right .btn-area {
           height: 24px;
       }
-      .toolbar {
+      .chatgpt-search-enhance .toolbar {
           display: none;
           align-items: center;
           gap: 8px;
@@ -837,7 +799,7 @@
       .toolbar-item-EhZYV5 svg:hover {
         cursor: pointer;
       }
-      .title:hover {
+      .chatgpt-search-enhance .title:hover {
         cursor: pointer;
         user-select: none;
         -webkit-user-drag: none;
@@ -845,7 +807,7 @@
         color: #3872e0!important;
         background-color: transparent;
       }
-      .footer {
+      .chatgpt-search-enhance .footer {
         box-sizing: border-box;
         display: none;
         align-items: center;
@@ -867,7 +829,7 @@
         });
         $('#answer').innerHTML = '加载中...';
         $('#copy').addEventListener('click', () => {
-          const text = $('#answer').innerHTML;
+          const text = $('#answer').innerText;
           copyToClipboard(text);
         });
         $('#footer').style.display = 'flex';
@@ -875,6 +837,69 @@
     });
   };
 
+
+  //md转换
+  function mdConverter(rawData) {
+    var converter = new showdown.Converter(); //增加拓展table
+    converter.setOption('tables', true); //启用表格选项。从showdown 1.2.0版开始，表支持已作为可选功能移入核心拓展，showdown.table.min.js扩展已被弃用
+    var view = converter.makeHtml(rawData);
+    return view;
+  }
+
+  // 递归更新节点
+  function updateNode(element, target) {
+    //如果是标签节点
+    if (element.nodeType == 1 && element.outerHTML != target.outerHTML) {
+      target.parentNode.replaceChild(element.cloneNode(true), target)
+      //如果是文本节点
+    } else if (element.nodeType == 3 && element.nodeValue != target.nodeValue) {
+      target.parentNode.replaceChild(element.cloneNode(true), target)
+    }
+  }
+  function diffAndUpdate(target, newContent) {
+    var array = newContent.childNodes
+    var org = target.childNodes
+    for (let index = 0; index < org.length; index++) {
+      if (!array[index]) {
+        org[index].parentNode.removeChild(org[index])
+      }
+
+      if (array[index] && array[index].cloneNode().outerHTML != org[index].cloneNode().outerHTML) {
+        org[index].parentNode.replaceChild(array[index].cloneNode(), org[index])
+      }
+
+    }
+    //console.log(newContent.innerHTML);
+    for (let index = 0; index < array.length; index++) {
+      const element = array[index];
+
+      if (org[index]) {
+        //如果有子节点，递归
+        if (element.childNodes && element.childNodes.length > 0) {
+          //首先要把当前节点更改成空节点
+          //  if (org[index].nodeType == 1 && org[index].outerHTML != element.outerHTML) {
+          //   org[index].parentNode.replaceChild(element.cloneNode(), org[index])
+          //  }
+          diffAndUpdate(org[index], element)
+        } else
+          updateNode(element, org[index])
+
+      } else {
+        //新增
+        //console.log(target);
+        if (target.nodeType == 1)
+          target.appendChild(element.cloneNode(true))
+
+      }
+    }
+
+  }
+  function demandInnerHTML(target, html) {
+    var copy = document.createElement('div')
+    copy.insertAdjacentHTML('beforeend', html)
+    diffAndUpdate(target, copy)
+  }
+  
   // 谷歌搜索ChatGPT应答
   const handleGoogleSearch = () => {
     window.addEventListener('load', () => {
@@ -1000,7 +1025,6 @@
     }
     return urls;
   }
-
   // 处理监听ChatGPT-web的消息
   const handlePostMessage = () => {
     // 父级，在frame处抛出接收事件
@@ -1045,7 +1069,8 @@
             !$('#chatgpt-search-enhance') && generateSearchEnhance();
           }
           if (event.data.type === 'search') {
-            $('#answer').innerHTML = event.data.data.content;
+            // $('#answer').innerHTML = mdConverter(event.data.data.content);
+            demandInnerHTML($('#answer'), mdConverter(event.data.data.content))
             $('#toolbar').style.display = 'inline-flex';
           }
           if (event.data.type === 'selectText') {
@@ -1148,10 +1173,10 @@
       <div>
     `;
     GM_addStyle(`
-      .brief-title {
+      #complateContent .brief-title {
         margin-right: 10px;
       }
-      .text-area {
+      #complateContent .text-area {
         width: 99%;
       }
       #selectActions {
@@ -1178,7 +1203,7 @@
           align-content: flex-start;
           justify-content: right;
       }
-      .tag-button {
+      #complateContent .tag-button {
           position: relative;
           cursor: pointer;
           user-select: none;
@@ -1197,19 +1222,19 @@
           max-width: 150px;
           background: #fff;
       }
-      .tag-button .text-wrapper-92ojRl {
+      #complateContent .tag-button .text-wrapper-92ojRl {
           flex: 1;
           min-width: 0px;
           display: flex;
           flex-direction: column;
       }
-      .tag-button .text-wrapper-92ojRl {
+      #complateContent .tag-button .text-wrapper-92ojRl {
           flex: 1;
           min-width: 0px;
           display: flex;
           flex-direction: column;
       }
-      .tag-button:hover {
+      #complateContent .tag-button:hover {
           background: rgba(235,202,254,.24);
           text-decoration: none!important;
       }
@@ -1403,6 +1428,13 @@
         activeCollapse: [1],
         logs: [
           {
+            title: '版本 1.2.0',
+            id: 1,
+            content: [
+              '1. 支持流式输出，响应更快啦！',
+            ]
+          },
+          {
             title: '版本 1.1.7',
             id: 1,
             content: [
@@ -1415,8 +1447,8 @@
             content: [
               '1. 支持百度、谷歌搜索增强',
               '2. 支持选中文本总结、翻译、扩写、代码解释、解释、语法、问答',
+              '3. 支持ChatGPT聊天的完整交互，可自定义prompt、定义角色等等',
               '4. 支持一句话生成油猴脚本，插件管理',
-              '3. 支持ChatGPT聊天的完整交互，可自定义prompt、定义角色等等'
             ]
           }
         ]
@@ -1529,7 +1561,7 @@
       chatRoom.innerHTML = `
             <p>抱歉，由于某些原因，无法加载此内容。</p>
             <p>请跳转网页版体验：${domain}。</p>
-           `;
+      `;
     };
 
     // 网页内容读取
