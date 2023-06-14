@@ -106,6 +106,6 @@ QQ群：151805744
 
 <img src="./assets/qq.jpg" width="200px" />
 
-捐赠（10块即可联系qq群主代注册ChatGPT）：
+捐赠（15米即可联系qq群主代注册ChatGPT，5米获取访问密码）：
 
 <img src="./assets/支付宝.jpg" width="200px" />
